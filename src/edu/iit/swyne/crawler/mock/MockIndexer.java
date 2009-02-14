@@ -1,32 +1,29 @@
 package edu.iit.swyne.crawler.mock;
 
+import java.util.ArrayList;
+
 import edu.iit.swyne.crawler.Indexer;
 import edu.iit.swyne.crawler.NewsDocument;
 
 public class MockIndexer implements Indexer {
 	
-	private NewsDocument[] docs;
-	private int currentIndex;
+	private ArrayList<NewsDocument> docs;
+	private int currentIndex = 0;
 	
 	public MockIndexer() {
-		docs = new NewsDocument[20];
-		currentIndex = 0;
+		docs = new ArrayList<NewsDocument>();
 	}
 	
-	public NewsDocument getDocument(int index) throws ArrayIndexOutOfBoundsException{
-		return docs[index];
+	public synchronized NewsDocument getDocument(int index) throws ArrayIndexOutOfBoundsException{
+		return docs.get(index);
 	}
 
-	public void sendDocument(NewsDocument doc) {
-//System.err.println("Trying to submit: "+doc.getTitle());
-		if(currentIndex < docs.length) {
-//System.err.println("Submiting article: "+doc.getTitle());
-			docs[currentIndex] = doc;
-			currentIndex++;
-		}
+	public synchronized void sendDocument(NewsDocument doc) {
+		docs.add(doc);
+		currentIndex++;
 	}
 	
-	public int getNumArticles() {
+	public synchronized int getNumArticles() {
 		return currentIndex;
 	}
 

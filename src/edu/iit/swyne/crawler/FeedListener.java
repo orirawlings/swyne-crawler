@@ -5,15 +5,13 @@ import java.util.HashMap;
 import java.util.List;
 
 import com.sun.syndication.feed.synd.SyndEntry;
-import com.sun.syndication.fetcher.FeedFetcher;
 import com.sun.syndication.fetcher.FetcherEvent;
 import com.sun.syndication.fetcher.FetcherListener;
 import com.sun.syndication.fetcher.impl.FeedFetcherCache;
 import com.sun.syndication.fetcher.impl.HashMapFeedInfoCache;
-import com.sun.syndication.fetcher.impl.HttpClientFeedFetcher;
 import com.sun.syndication.fetcher.impl.HttpURLFeedFetcher;
 
-public class FeedListener {
+public class FeedListener implements Runnable{
 
 	private URL url;
 	private FeedFetcherCache cache;
@@ -27,14 +25,24 @@ public class FeedListener {
 		fetcher = new HttpURLFeedFetcher(cache);
 		fetcher.addFetcherEventListener(new FetchListenImpl());
 	}
+	
+	public void run() {
+		try {
+			runMethod();
+		}
+		catch (IndexerNotDefinedException inde) {
+			System.err.println("ERROR: "+inde.getMessage());
+			inde.printStackTrace();
+		}
+	}
 
-	public void run() throws IndexerNotDefinedException {
+	public void runMethod() throws IndexerNotDefinedException {
 		if (indexer == null) throw new IndexerNotDefinedException("No indexer has been set for this feed listener.");
 		
 		try {
 			fetcher.retrieveFeed(url);
 		} catch (Exception e) {
-			System.out.println("ERROR: "+e.getMessage());
+			System.err.println("ERROR: "+e.getMessage());
 			e.printStackTrace();
 		}
 	}
@@ -69,6 +77,7 @@ public class FeedListener {
 			entryHash = new HashMap<SyndEntry, Boolean>();
 		}
 		
+		@SuppressWarnings("unchecked")
 		public void fetcherEvent(FetcherEvent event) {
 			String eventType = event.getEventType();
 			
