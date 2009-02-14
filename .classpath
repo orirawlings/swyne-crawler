@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
+	<classpathentry kind="lib" path="lib/htmlparser.jar"/>
+	<classpathentry kind="lib" path="lib/jdom.jar"/>
+	<classpathentry kind="lib" path="lib/rome-1.0RC2.jar" sourcepath="lib/rome-1.0RC2-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/crawler/lib/rome-1.0RC2-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/rome-fetcher-1.0RC2.jar" sourcepath="lib/rome-fetcher-1.0RC2-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/crawler/lib/rome-fetcher-1.0RC2-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
