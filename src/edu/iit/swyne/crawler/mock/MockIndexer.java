@@ -14,7 +14,7 @@ public class MockIndexer implements Indexer {
 		docs = new ArrayList<NewsDocument>();
 	}
 	
-	public synchronized NewsDocument getDocument(int index) throws ArrayIndexOutOfBoundsException{
+	public synchronized NewsDocument getDocument(int index) throws ArrayIndexOutOfBoundsException {
 		return docs.get(index);
 	}
 
