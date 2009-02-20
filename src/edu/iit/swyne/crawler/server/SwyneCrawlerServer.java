@@ -51,6 +51,10 @@ public class SwyneCrawlerServer {
 			e.printStackTrace();
 		}
 	}
+	
+	public Indexer getIndexer() {
+		return indexer;
+	}
 
 	public boolean isRunning() {
 		return listening;
@@ -58,6 +62,13 @@ public class SwyneCrawlerServer {
 
 	public void shutdown() {
 		this.listening = false;
+		scheduler.shutdown();
+		try {
+			scheduler.awaitTermination(60, TimeUnit.SECONDS);
+		} catch (InterruptedException e) {
+			System.err.println("ERROR: "+e.getMessage());
+			e.printStackTrace();
+		}
 	}
 
 	public void start() {
@@ -85,6 +96,16 @@ public class SwyneCrawlerServer {
 
 	public int numFeedsTracking() {
 		return feedTasks.size();
+	}
+
+	public boolean isTrackingFeed(URL feedURL) {
+		return feedTasks.containsKey(feedURL);
+	}
+
+	@SuppressWarnings("unchecked")
+	public void removeFeed(URL feedURL) {
+		ScheduledFuture feedJob = feedTasks.remove(feedURL);
+		feedJob.cancel(false);
 	}
 
 }

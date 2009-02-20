@@ -21,6 +21,7 @@ public class MockIndexer implements Indexer {
 	public synchronized void sendDocument(NewsDocument doc) {
 		docs.add(doc);
 		currentIndex++;
+		System.out.println(this.getClass().toString()+" indexed: "+doc.getTitle());
 	}
 	
 	public synchronized int getNumArticles() {

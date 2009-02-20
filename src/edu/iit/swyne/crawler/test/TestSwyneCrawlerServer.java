@@ -4,10 +4,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Properties;
 
+import junit.framework.TestCase;
 import edu.iit.swyne.crawler.server.SwyneCrawlerServer;
 import edu.iit.swyne.crawler.server.SwyneCrawlerServer.FeedAlreadyTrackedException;
-
-import junit.framework.TestCase;
 
 public class TestSwyneCrawlerServer extends TestCase {
 	URL feedURL;
@@ -52,6 +51,7 @@ public class TestSwyneCrawlerServer extends TestCase {
 		server.start();
 		server.addFeed(feedURL);
 		assertEquals(1, server.numFeedsTracking());
+		assertEquals(true, server.isTrackingFeed(feedURL));
 	}
 	
 	public void testAddFeedTwice() throws Exception {
@@ -65,5 +65,16 @@ public class TestSwyneCrawlerServer extends TestCase {
 			assertNotNull(e.getMessage());
 		}
 		assertEquals(1, server.numFeedsTracking());
+		assertEquals(true, server.isTrackingFeed(feedURL));
+	}
+	
+	public void testRemoveFeed() throws Exception {
+		server.start();
+		server.addFeed(feedURL);
+		assertEquals(1, server.numFeedsTracking());
+		assertEquals(true, server.isTrackingFeed(feedURL));
+		server.removeFeed(feedURL);
+		assertEquals(0, server.numFeedsTracking());
+		assertEquals(false, server.isTrackingFeed(feedURL));
 	}
 }
