@@ -11,6 +11,12 @@ import com.sun.syndication.fetcher.impl.FeedFetcherCache;
 import com.sun.syndication.fetcher.impl.HashMapFeedInfoCache;
 import com.sun.syndication.fetcher.impl.HttpURLFeedFetcher;
 
+/**
+ * @author Ori Rawlings
+ * 
+ * A thread-safe object, which polls a web feed and indexes it if there is new content
+ *
+ */
 public class FeedListener implements Runnable{
 
 	private URL url;
@@ -36,7 +42,7 @@ public class FeedListener implements Runnable{
 		}
 	}
 
-	public void runMethod() throws IndexerNotDefinedException {
+	public synchronized void runMethod() throws IndexerNotDefinedException {
 		if (indexer == null) throw new IndexerNotDefinedException("No indexer has been set for this feed listener.");
 		
 		try {
@@ -47,22 +53,26 @@ public class FeedListener implements Runnable{
 		}
 	}
 
-	public URL getUrl() {
+	public synchronized URL getUrl() {
 		return url;
 	}
 
-	public void setUrl(URL url) {
+	public synchronized void setUrl(URL url) {
 		this.url = url;
 	}
 
-	public Indexer getIndexer() {
+	public synchronized Indexer getIndexer() {
 		return indexer;
 	}
 
-	public void setIndexer(Indexer indexer) {
+	public synchronized void setIndexer(Indexer indexer) {
 		this.indexer = indexer;
 	}
 	
+	public synchronized void destroyCache() {
+		fetcher.getFeedInfoCache().clear();
+	}
+
 	public class IndexerNotDefinedException extends Exception {
 		public IndexerNotDefinedException(String string) {
 			super(string);
@@ -94,10 +104,6 @@ public class FeedListener implements Runnable{
 				}
 			}
 		}
-	}
-
-	public void destroyCache() {
-		fetcher.getFeedInfoCache().clear();
 	}
 
 }

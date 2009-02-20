@@ -12,7 +12,7 @@ import edu.iit.swyne.crawler.Indexer;
 import edu.iit.swyne.crawler.mock.MockIndexer;
 
 /**
- * @author orirawlings
+ * @author Ori Rawlings
  *
  */
 public class TestFeedListener extends TestCase {
