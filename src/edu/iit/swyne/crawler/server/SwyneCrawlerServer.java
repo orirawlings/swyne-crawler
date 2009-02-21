@@ -1,8 +1,12 @@
 package edu.iit.swyne.crawler.server;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.InvalidPropertiesFormatException;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executors;
@@ -14,22 +18,20 @@ import edu.iit.swyne.crawler.FeedListener;
 import edu.iit.swyne.crawler.Indexer;
 
 public class SwyneCrawlerServer {
-
-	@SuppressWarnings("serial")
-	public class FeedAlreadyTrackedException extends Exception {
-		public FeedAlreadyTrackedException(String string) {
-			super(string);
-		}
-
-	}
+	
+	private final static String DEFAULT_INDEXER = "edu.iit.swyne.crawler.mock.MockIndexer";
+	private final static String DEFAULT_PORT = "6970";
+	private final static String DEFAULT_MAX_THREADS = "5";
+	private final static String DEFAULT_POLLING_INTERVAL_SECS = "3600";
 
 	protected boolean initialized;
 	protected boolean listening;
 	protected Properties props;
-	private ScheduledExecutorService scheduler;
 	protected Indexer indexer;
+	
 	@SuppressWarnings("unchecked")
 	private Map<URL, ScheduledFuture> feedTasks = Collections.synchronizedMap(new HashMap<URL, ScheduledFuture>());
+	private ScheduledExecutorService scheduler;
 
 	public SwyneCrawlerServer(Properties props) {
 		this.props = props;
@@ -109,5 +111,41 @@ public class SwyneCrawlerServer {
 		ScheduledFuture feedJob = feedTasks.remove(feedURL);
 		feedJob.cancel(false);
 	}
-
+	
+	public static void main(String[] args) {
+		// Build the default properties for the server
+		Properties defaultProps = new Properties();
+		defaultProps.setProperty("server.port", DEFAULT_PORT);
+		defaultProps.setProperty("server.maxThreads", DEFAULT_MAX_THREADS);
+		defaultProps.setProperty("feeds.pollingInterval", DEFAULT_POLLING_INTERVAL_SECS);
+		defaultProps.setProperty("indexer.class", DEFAULT_INDEXER);
+		
+		// Construct the actual properties, relying on default properties where attributes are undefined
+		Properties props = new Properties(defaultProps);
+		// If a file path is specified on the command-line, load that file into properties
+		if (args.length > 0)
+			try {
+				props.loadFromXML(new FileInputStream(args[0]));
+			} catch (InvalidPropertiesFormatException e) {
+				System.err.println("ERROR: "+e.getMessage());
+				e.printStackTrace();
+			} catch (FileNotFoundException e) {
+				System.err.println("ERROR: "+e.getMessage());
+				e.printStackTrace();
+			} catch (IOException e) {
+				System.err.println("ERROR: "+e.getMessage());
+				e.printStackTrace();
+			}
+			
+		SwyneCrawlerServer server = new SwyneCrawlerServer(props);
+		server.init();
+		server.start();
+	}
+	
+	@SuppressWarnings("serial")
+	public class FeedAlreadyTrackedException extends Exception {
+		public FeedAlreadyTrackedException(String string) {
+			super(string);
+		}
+	}
 }
