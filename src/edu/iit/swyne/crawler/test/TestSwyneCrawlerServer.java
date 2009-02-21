@@ -33,25 +33,25 @@ public class TestSwyneCrawlerServer extends TestCase {
 	}
 	
 	public void testStartAndStopServer() throws Exception {
-		assertEquals(false, server.isRunning());
+		assertFalse(server.isRunning());
 		server.start();
-		assertEquals(true, server.isRunning());
+		assertTrue(server.isRunning());
 		server.shutdown();
-		assertEquals(false, server.isRunning());
+		assertFalse(server.isRunning());
 	}
 	
 	public void testAddFeedBeforeStartingServer() throws Exception {
 		// The server should start up if a request to add a feed has been made
-		assertEquals(false, server.isRunning());
+		assertFalse(server.isRunning());
 		server.addFeed(feedURL);
-		assertEquals(true, server.isRunning());
+		assertTrue(server.isRunning());
 	}
 	
 	public void testAddFeed() throws Exception {
 		server.start();
 		server.addFeed(feedURL);
 		assertEquals(1, server.numFeedsTracking());
-		assertEquals(true, server.isTrackingFeed(feedURL));
+		assertTrue(server.isTrackingFeed(feedURL));
 	}
 	
 	public void testAddFeedTwice() throws Exception {
@@ -65,16 +65,16 @@ public class TestSwyneCrawlerServer extends TestCase {
 			assertNotNull(e.getMessage());
 		}
 		assertEquals(1, server.numFeedsTracking());
-		assertEquals(true, server.isTrackingFeed(feedURL));
+		assertTrue(server.isTrackingFeed(feedURL));
 	}
 	
 	public void testRemoveFeed() throws Exception {
 		server.start();
 		server.addFeed(feedURL);
 		assertEquals(1, server.numFeedsTracking());
-		assertEquals(true, server.isTrackingFeed(feedURL));
+		assertTrue(server.isTrackingFeed(feedURL));
 		server.removeFeed(feedURL);
 		assertEquals(0, server.numFeedsTracking());
-		assertEquals(false, server.isTrackingFeed(feedURL));
+		assertFalse(server.isTrackingFeed(feedURL));
 	}
 }

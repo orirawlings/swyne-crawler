@@ -23,11 +23,11 @@ public class SwyneCrawlerServer {
 
 	}
 
-	private boolean initialized;
-	private boolean listening;
-	private Properties props;
+	protected boolean initialized;
+	protected boolean listening;
+	protected Properties props;
 	private ScheduledExecutorService scheduler;
-	private Indexer indexer;
+	protected Indexer indexer;
 	@SuppressWarnings("unchecked")
 	private Map<URL, ScheduledFuture> feedTasks = Collections.synchronizedMap(new HashMap<URL, ScheduledFuture>());
 
@@ -35,32 +35,34 @@ public class SwyneCrawlerServer {
 		this.props = props;
 	}
 
-	public void init() {
-		this.initialized = true;
-		this.scheduler = Executors.newScheduledThreadPool(Integer.parseInt(props.getProperty("server.maxThreads")));
-		try {
-			this.indexer = (Indexer) Class.forName(props.getProperty("indexer.class", "edu.iit.swyne.crawler.mock.MockIndexer")).newInstance();
-		} catch (InstantiationException e) {
-			System.err.println(e.getMessage());
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			System.err.println(e.getMessage());
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			System.err.println(e.getMessage());
-			e.printStackTrace();
+	public synchronized void init() {
+		if(!this.initialized) {
+			this.initialized = true;
+			this.scheduler = Executors.newScheduledThreadPool(Integer.parseInt(props.getProperty("server.maxThreads")));
+			try {
+				this.indexer = (Indexer) Class.forName(props.getProperty("indexer.class", "edu.iit.swyne.crawler.mock.MockIndexer")).newInstance();
+			} catch (InstantiationException e) {
+				System.err.println(e.getMessage());
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				System.err.println(e.getMessage());
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				System.err.println(e.getMessage());
+				e.printStackTrace();
+			}
 		}
 	}
 	
-	public Indexer getIndexer() {
+	public synchronized Indexer getIndexer() {
 		return indexer;
 	}
 
-	public boolean isRunning() {
+	public synchronized boolean isRunning() {
 		return listening;
 	}
 
-	public void shutdown() {
+	public synchronized void shutdown() {
 		this.listening = false;
 		scheduler.shutdown();
 		try {
@@ -71,18 +73,18 @@ public class SwyneCrawlerServer {
 		}
 	}
 
-	public void start() {
+	public synchronized void start() {
 		if(!this.isInitialized()) {
 			this.init();
 		}
 		this.listening = true;
 	}
 
-	private boolean isInitialized() {
+	private synchronized boolean isInitialized() {
 		return initialized;
 	}
 
-	public void addFeed(URL feedURL) throws FeedAlreadyTrackedException{
+	public synchronized void addFeed(URL feedURL) throws FeedAlreadyTrackedException{
 		if (!this.isRunning()) {
 			this.start();
 		}
@@ -91,19 +93,19 @@ public class SwyneCrawlerServer {
 		if (!feedTasks.containsKey(feedURL)) {
 			feedTasks.put(feedURL, scheduler.scheduleWithFixedDelay(listener, 0, Integer.parseInt(props.getProperty("feeds.pollingInterval")), TimeUnit.SECONDS));
 		}
-		else throw new FeedAlreadyTrackedException("This feed has been previously added");
+		else throw new FeedAlreadyTrackedException("Feed " + feedURL.toString() + " has been previously added");
 	}
 
-	public int numFeedsTracking() {
+	public synchronized int numFeedsTracking() {
 		return feedTasks.size();
 	}
 
-	public boolean isTrackingFeed(URL feedURL) {
+	public synchronized boolean isTrackingFeed(URL feedURL) {
 		return feedTasks.containsKey(feedURL);
 	}
 
 	@SuppressWarnings("unchecked")
-	public void removeFeed(URL feedURL) {
+	public synchronized void removeFeed(URL feedURL) {
 		ScheduledFuture feedJob = feedTasks.remove(feedURL);
 		feedJob.cancel(false);
 	}
