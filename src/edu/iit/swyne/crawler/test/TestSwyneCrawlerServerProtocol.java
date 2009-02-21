@@ -1,26 +1,36 @@
 package edu.iit.swyne.crawler.test;
 
+import java.lang.reflect.Constructor;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Properties;
 
 import junit.framework.TestCase;
-import edu.iit.swyne.crawler.mock.MockSwyneCrawlerServer;
 import edu.iit.swyne.crawler.server.SwyneCrawlerServer;
 import edu.iit.swyne.crawler.server.SwyneCrawlerServerProtocol;
 
 public class TestSwyneCrawlerServerProtocol extends TestCase {
+//	private final String SERVER_CLASS = "edu.iit.swyne.crawler.mock.MockSwyneCrawlerServer";
+	private final String SERVER_CLASS = "edu.iit.swyne.crawler.server.SwyneCrawlerServer";
+	
 	private Properties props = new Properties();
 	private URL feedURL;
 	private SwyneCrawlerServer server;
 	
 	public TestSwyneCrawlerServerProtocol() throws MalformedURLException {
 		feedURL = new URL("http://omega.cs.iit.edu/~orawling/iproTesting/news.rss");
+		props.setProperty("crawler.server.class", SERVER_CLASS);
+		props.setProperty("server.socket", "6970");
+		props.setProperty("indexer.class", "edu.iit.swyne.crawler.mock.MockIndexer");
+		props.setProperty("server.maxThreads", "5");
+		props.setProperty("feeds.pollingInterval", "600");
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void setUp() throws Exception {
-		server = new MockSwyneCrawlerServer(props);
+		Constructor<SwyneCrawlerServer> c = (Constructor<SwyneCrawlerServer>) Class.forName(props.getProperty("crawler.server.class")).getConstructor(Properties.class);
+		server = c.newInstance(props);
 		server.init();
 		server.start();
 	}

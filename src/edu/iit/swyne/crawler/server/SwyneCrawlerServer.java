@@ -93,7 +93,7 @@ public class SwyneCrawlerServer {
 		if (!feedTasks.containsKey(feedURL)) {
 			feedTasks.put(feedURL, scheduler.scheduleWithFixedDelay(listener, 0, Integer.parseInt(props.getProperty("feeds.pollingInterval")), TimeUnit.SECONDS));
 		}
-		else throw new FeedAlreadyTrackedException("Feed " + feedURL.toString() + " has been previously added");
+		else throw new FeedAlreadyTrackedException("Feed " + feedURL.toString() + " has been previously added.");
 	}
 
 	public synchronized int numFeedsTracking() {
