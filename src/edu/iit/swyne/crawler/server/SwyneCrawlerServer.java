@@ -1,153 +1,147 @@
 package edu.iit.swyne.crawler.server;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URL;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.InvalidPropertiesFormatException;
-import java.util.Map;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketException;
 import java.util.Properties;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 
-import edu.iit.swyne.crawler.FeedListener;
-import edu.iit.swyne.crawler.Indexer;
+import edu.iit.swyne.crawler.SwyneCrawler;
 
-public class SwyneCrawlerServer {
+public class SwyneCrawlerServer extends Thread implements CrawlerServer {
 	
-	private final static String DEFAULT_INDEXER = "edu.iit.swyne.crawler.mock.MockIndexer";
+	public static final String NAME = "Swyne Crawler Server";
+	public static final String VERSION = "v0.1";
+	
 	private final static String DEFAULT_PORT = "6970";
-	private final static String DEFAULT_MAX_THREADS = "5";
-	private final static String DEFAULT_POLLING_INTERVAL_SECS = "3600";
-
-	protected boolean initialized;
-	protected boolean listening;
-	protected Properties props;
-	protected Indexer indexer;
+	private static final String DEFAULT_MAX_PENDING_CONNECTIONS = "5";
+	private static final String DEFAULT_MAX_REQUEST_THREADS = "3";
+	private static final String DEFAULT_MIN_REQUEST_THREADS = "1";
+	private static final String DEFAULT_MAX_REQUESTS = "5";
 	
-	private Map<URL, ScheduledFuture<?>> feedTasks = Collections.synchronizedMap(new HashMap<URL, ScheduledFuture<?>>());
-	private ScheduledExecutorService scheduler;
-
-	public SwyneCrawlerServer(Properties props) {
-		Properties defaultProps = new Properties();
-		defaultProps.setProperty("server.port", DEFAULT_PORT);
-		defaultProps.setProperty("server.maxThreads", DEFAULT_MAX_THREADS);
-		defaultProps.setProperty("feeds.pollingInterval", DEFAULT_POLLING_INTERVAL_SECS);
-		defaultProps.setProperty("indexer.class", DEFAULT_INDEXER);
-		
-		this.props = new Properties(defaultProps);
-		this.props.putAll(props);
-	}
+	private Properties props;
+	private RequestQueue requestQueue;
+	private ServerSocket serverSocket;
+	private boolean running;
+	private SwyneCrawler crawler;
 	
-	public SwyneCrawlerServer() {
+	public SwyneCrawlerServer() throws Exception {
 		this(new Properties());
 	}
 
-	public synchronized void init() {
-		if(!this.initialized) {
-			this.initialized = true;
-			this.scheduler = Executors.newScheduledThreadPool(Integer.parseInt(props.getProperty("server.maxThreads")));
-			try {
-				this.indexer = (Indexer) Class.forName(props.getProperty("indexer.class", "edu.iit.swyne.crawler.mock.MockIndexer")).newInstance();
-			} catch (InstantiationException e) {
-				System.err.println(e.getMessage());
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				System.err.println(e.getMessage());
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				System.err.println(e.getMessage());
-				e.printStackTrace();
-			}
-		}
-	}
-	
-	public synchronized Indexer getIndexer() {
-		return indexer;
-	}
-
-	public synchronized boolean isRunning() {
-		return listening;
-	}
-
-	public synchronized void shutdown() {
-		this.listening = false;
-		scheduler.shutdown();
-		try {
-			scheduler.awaitTermination(60, TimeUnit.SECONDS);
-		} catch (InterruptedException e) {
-			System.err.println("ERROR: "+e.getMessage());
-			e.printStackTrace();
-		}
-	}
-
-	public synchronized void start() {
-		if(!this.isInitialized()) {
-			this.init();
-		}
-		this.listening = true;
-	}
-
-	private synchronized boolean isInitialized() {
-		return initialized;
-	}
-
-	public synchronized void addFeed(URL feedURL) throws FeedAlreadyTrackedException{
-		if (!this.isRunning()) {
-			this.start();
-		}
-		FeedListener listener = new FeedListener(feedURL);
-		listener.setIndexer(indexer);
-		if (!feedTasks.containsKey(feedURL)) {
-			feedTasks.put(feedURL, scheduler.scheduleWithFixedDelay(listener, 0, Integer.parseInt(props.getProperty("feeds.pollingInterval")), TimeUnit.SECONDS));
-		}
-		else throw new FeedAlreadyTrackedException("Feed " + feedURL.toString() + " has been previously added.");
-	}
-
-	public synchronized int numFeedsTracking() {
-		return feedTasks.size();
-	}
-
-	public synchronized boolean isTrackingFeed(URL feedURL) {
-		return feedTasks.containsKey(feedURL);
-	}
-
-	public synchronized void removeFeed(URL feedURL) {
-		ScheduledFuture<?> feedJob = feedTasks.remove(feedURL);
-		feedJob.cancel(false);
-	}
-	
-	public static void main(String[] args) {
-		Properties props = new Properties();
+	public SwyneCrawlerServer(Properties properties) throws Exception {
+		Properties defaultProps = new Properties();
+		defaultProps.setProperty("server.port", DEFAULT_PORT);
+		defaultProps.setProperty("server.maxPendingConnections", DEFAULT_MAX_PENDING_CONNECTIONS);
+		defaultProps.setProperty("server.maxThreads", DEFAULT_MAX_REQUEST_THREADS);
+		defaultProps.setProperty("server.minThreads", DEFAULT_MIN_REQUEST_THREADS);
+		defaultProps.setProperty("server.maxRequests", DEFAULT_MAX_REQUESTS);
+		defaultProps.setProperty("server.requestHandler", "edu.iit.swyne.crawler.server.SwyneCrawlerServerThread");
+		defaultProps.setProperty("server.protocol", "edu.iit.swyne.crawler.server.SwyneCrawlerServerProtocol");
 		
-		// If a file path is specified on the command-line, load that file into properties
-		if (args.length > 0)
-			try {
-				props.loadFromXML(new FileInputStream(args[0]));
-			} catch (InvalidPropertiesFormatException e) {
-				System.err.println("ERROR: "+e.getMessage());
-				e.printStackTrace();
-			} catch (FileNotFoundException e) {
-				System.err.println("ERROR: "+e.getMessage());
-				e.printStackTrace();
-			} catch (IOException e) {
-				System.err.println("ERROR: "+e.getMessage());
-				e.printStackTrace();
-			}
-			
-		SwyneCrawlerServer server = new SwyneCrawlerServer(props);
-		server.init();
-		server.start();
+		this.props = new Properties(defaultProps);
+		this.props.putAll(properties);
+		
+		this.crawler = new SwyneCrawler(this.props);
+		
+		int maxQueueSize = Integer.parseInt(this.props.getProperty("server.maxRequests"));
+		int maxThreads = Integer.parseInt(this.props.getProperty("server.maxThreads"));
+		int minThreads = Integer.parseInt(this.props.getProperty("server.minThreads"));
+		this.requestQueue = new RequestQueue(this, this.props.getProperty("server.requestHandler"), maxQueueSize, maxThreads, minThreads);
 	}
 	
-	@SuppressWarnings("serial")
-	public class FeedAlreadyTrackedException extends Exception {
-		public FeedAlreadyTrackedException(String string) {
-			super(string);
+	public SwyneCrawler getCrawler() {
+		return crawler;
+	}
+
+	public synchronized void startServer() {
+		if (!this.running) {
+			int port = Integer.parseInt(this.props.getProperty("server.port"));
+			int backlog = Integer.parseInt(this.props.getProperty("server.maxPendingConnections"));
+			
+			try {
+				this.serverSocket = new ServerSocket(port, backlog);
+				
+				this.start();
+				Thread.sleep(3000);
+			} catch (IOException e) {
+				System.err.println("ERROR: Couldn't create server socket");
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public synchronized void stopServer() {
+		if (this.running) {
+			try {
+				this.running = false;
+				this.serverSocket.close();
+				this.crawler.shutdown();
+			} catch (IOException e) {
+				System.err.println("ERROR: Could not close server socket");
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	@Override
+	public void run() {
+		// Start running the server
+		System.out.println(NAME + " " + VERSION);
+		System.out.println("Server started...");
+		System.out.println("Listening on port: " + this.props.getProperty("server.port"));
+		this.running = true;
+
+		this.crawler.init();
+		this.crawler.start();
+		
+		while (this.running) {
+			try {
+				Socket s = this.serverSocket.accept();
+				
+				InetAddress addr = s.getInetAddress();
+				System.out.println("Connection from: " + addr.getHostAddress() + " " + addr.getHostName());
+				
+				this.requestQueue.add(s);
+			} catch (SocketException e) {
+				// This should be caught when we shutdown the server
+				// Otherwise, this is an error
+				if (this.running) {
+					System.err.println("ERROR: Unexpected socket exception");
+					if (e.getMessage() != null) System.err.println(e.getMessage());
+					e.printStackTrace();
+				}
+			} catch (Exception e) {
+				System.err.println("ERROR : "+e.getMessage());
+				e.printStackTrace();
+			}
+		}
+		
+		System.out.println("Server shuting down...");
+		this.requestQueue.shutdown();
+	}
+
+	public boolean isRunning() {
+		return this.running;
+	}
+	
+	public static void main(String[] args) throws Exception {
+		SwyneCrawlerServer server = new SwyneCrawlerServer();
+		server.startServer();
+	}
+
+	public RequestHandler getRequestHandlerInstance() {
+		try {
+			return (RequestHandler) Class.forName(this.props.getProperty("server.requestHandler")).getConstructor(SwyneCrawlerServer.class).newInstance(this);
+		} catch (Exception e) {
+			System.err.println("ERROR: Failed to create server request handler");
+			if (e.getMessage() != null) System.err.println(e.getMessage());
+			e.printStackTrace();
+			return null;
 		}
 	}
 }

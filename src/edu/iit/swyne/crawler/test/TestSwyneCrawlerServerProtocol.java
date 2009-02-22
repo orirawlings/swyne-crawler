@@ -1,43 +1,40 @@
 package edu.iit.swyne.crawler.test;
 
-import java.lang.reflect.Constructor;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Properties;
 
 import junit.framework.TestCase;
-import edu.iit.swyne.crawler.server.SwyneCrawlerServer;
+import edu.iit.swyne.crawler.mock.MockCrawlerServer;
+import edu.iit.swyne.crawler.server.CrawlerServer;
 import edu.iit.swyne.crawler.server.SwyneCrawlerServerProtocol;
 
 public class TestSwyneCrawlerServerProtocol extends TestCase {
-//	private final String SERVER_CLASS = "edu.iit.swyne.crawler.mock.MockSwyneCrawlerServer";
-	private final String SERVER_CLASS = "edu.iit.swyne.crawler.server.SwyneCrawlerServer";
+	private final String SERVER_CLASS = "edu.iit.swyne.crawler.mock.MockCrawlerServer";
+//	private final String SERVER_CLASS = "edu.iit.swyne.crawler.SwyneCrawlerServer";
 	
 	private Properties props = new Properties();
 	private URL feedURL;
-	private SwyneCrawlerServer server;
+	private CrawlerServer server;
 	
 	public TestSwyneCrawlerServerProtocol() throws MalformedURLException {
 		feedURL = new URL("http://omega.cs.iit.edu/~orawling/iproTesting/news.rss");
-		props.setProperty("crawler.server.class", SERVER_CLASS);
-		props.setProperty("server.socket", "6970");
-		props.setProperty("indexer.class", "edu.iit.swyne.crawler.mock.MockIndexer");
-		props.setProperty("server.maxThreads", "5");
-		props.setProperty("feeds.pollingInterval", "600");
+		props.setProperty("server.class", SERVER_CLASS);
 	}
 	
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void setUp() throws Exception {
-		Constructor<SwyneCrawlerServer> c = (Constructor<SwyneCrawlerServer>) Class.forName(props.getProperty("crawler.server.class")).getConstructor(Properties.class);
-		server = c.newInstance(props);
-		server.init();
-		server.start();
+		Class serverClass = Class.forName(props.getProperty("server.class"));
+		server = (CrawlerServer) serverClass.newInstance();
+		server = new MockCrawlerServer();
+		server.startServer();
 	}
 	
 	@Override
 	protected void tearDown() throws Exception {
-		server.shutdown();
+		server.stopServer();
+//		Thread.sleep(15000);
 	}
 	
 	public void testShutdown() throws Exception {
@@ -61,7 +58,7 @@ public class TestSwyneCrawlerServerProtocol extends TestCase {
 	}
 	
 	public void testUnexpectedError() throws Exception {
-		server.shutdown();
+		server.stopServer();
 		assertFalse(server.isRunning());
 		
 		String command = "add "+feedURL.toString();
@@ -72,14 +69,14 @@ public class TestSwyneCrawlerServerProtocol extends TestCase {
 		String command = "add "+feedURL.toString();
 		
 		assertEquals(SwyneCrawlerServerProtocol.ADD_SUCCESS_MESSAGE+" "+feedURL.toString()+"\n", SwyneCrawlerServerProtocol.run(command, server));
-		assertTrue(server.isTrackingFeed(feedURL));
+		assertTrue(server.getCrawler().isTrackingFeed(feedURL));
 	}
 	
 	public void testAddFeedTwice() throws Exception {
 		String command = "add "+feedURL.toString();
 		
 		assertEquals(SwyneCrawlerServerProtocol.ADD_SUCCESS_MESSAGE+" "+feedURL.toString()+"\n", SwyneCrawlerServerProtocol.run(command, server));
-		assertTrue(server.isTrackingFeed(feedURL));
+		assertTrue(server.getCrawler().isTrackingFeed(feedURL));
 		
 		assertEquals(SwyneCrawlerServerProtocol.ADD_FAILURE_MESSAGE_ALREADY_TRACKED+" "+"Feed " + feedURL.toString() + " has been previously added.\n", SwyneCrawlerServerProtocol.run(command, server));
 	}
@@ -94,10 +91,10 @@ public class TestSwyneCrawlerServerProtocol extends TestCase {
 		String command = "add "+feedURL.toString();
 		
 		SwyneCrawlerServerProtocol.run(command, server);
-		assertTrue(server.isTrackingFeed(feedURL));
+		assertTrue(server.getCrawler().isTrackingFeed(feedURL));
 		
 		command = "remove "+feedURL.toString();
 		assertEquals(SwyneCrawlerServerProtocol.REMOVE_SUCCESS_MESSAGE+" "+feedURL.toString()+"\n", SwyneCrawlerServerProtocol.run(command, server));
-		assertFalse(server.isTrackingFeed(feedURL));
+		assertFalse(server.getCrawler().isTrackingFeed(feedURL));
 	}
 }

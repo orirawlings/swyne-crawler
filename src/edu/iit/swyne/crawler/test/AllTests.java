@@ -10,7 +10,7 @@ public class AllTests {
 		suite.addTestSuite(TestTextExtractor.class);
 		suite.addTestSuite(TestSwyneIndexer.class);
 		suite.addTestSuite(TestFeedListener.class);
-		suite.addTestSuite(TestSwyneCrawlerServer.class);
+		suite.addTestSuite(TestSwyneCrawler.class);
 		suite.addTestSuite(TestSwyneCrawlerServerProtocol.class);
 		
 		return suite;

@@ -4,7 +4,7 @@ import java.io.BufferedReader;
 import java.io.StringReader;
 import java.net.URL;
 
-import edu.iit.swyne.crawler.server.SwyneCrawlerServer.FeedAlreadyTrackedException;
+import edu.iit.swyne.crawler.FeedAlreadyTrackedException;
 
 public class SwyneCrawlerServerProtocol {
 
@@ -40,7 +40,7 @@ public class SwyneCrawlerServerProtocol {
 	public static final String UNKNOWN_COMMAND_MESSAGE				= UNKNOWN_COMMAND + " UNKNOWN_COMMAND";
 	public static final String UNEXPECTED_ERROR_MESSAGE				= UNEXPECTED_ERROR + " UNEXPECTED_ERROR";
 
-	public static String run(String command, SwyneCrawlerServer server) {
+	public static String run(String command, CrawlerServer server) {
 		String response = "";
 		
 		BufferedReader in = new BufferedReader(new StringReader(command));
@@ -53,7 +53,7 @@ public class SwyneCrawlerServerProtocol {
 				String[] args = line.split("\\s");
 				
 				if (args[0].compareToIgnoreCase(COMMAND_SHUTDOWN) == 0) {
-					server.shutdown();
+					server.stopServer();
 					if (!server.isRunning()) response += SHUTDOWN_SUCCESS_MESSAGE;
 					else response += SHUTDOWN_FAILURE_MESSAGE;
 					return response;
@@ -63,8 +63,8 @@ public class SwyneCrawlerServerProtocol {
 						response += ADD_FAILURE_MESSAGE_NO_URL_GIVEN;
 					else {
 						URL feedURL = new URL(args[1]);
-						server.addFeed(feedURL);
-						response += !server.isTrackingFeed(feedURL) ? ADD_FAILURE_MESSAGE : ADD_SUCCESS_MESSAGE+" "+feedURL.toString();
+						server.getCrawler().addFeed(feedURL);
+						response += !server.getCrawler().isTrackingFeed(feedURL) ? ADD_FAILURE_MESSAGE : ADD_SUCCESS_MESSAGE+" "+feedURL.toString();
 					}
 				}
 				else if (args[0].compareToIgnoreCase(COMMAND_REMOVE) == 0) {
@@ -72,8 +72,8 @@ public class SwyneCrawlerServerProtocol {
 						response += REMOVE_FAILURE_MESSAGE_NO_URL_GIVEN;
 					else {
 						URL feedURL = new URL(args[1]);
-						server.removeFeed(feedURL);
-						response += server.isTrackingFeed(feedURL) ? REMOVE_FAILURE_MESSAGE : REMOVE_SUCCESS_MESSAGE+" "+feedURL.toString();
+						server.getCrawler().removeFeed(feedURL);
+						response += server.getCrawler().isTrackingFeed(feedURL) ? REMOVE_FAILURE_MESSAGE : REMOVE_SUCCESS_MESSAGE+" "+feedURL.toString();
 					}
 				}
 				else response += UNKNOWN_COMMAND_MESSAGE+" \""+line+"\"";
