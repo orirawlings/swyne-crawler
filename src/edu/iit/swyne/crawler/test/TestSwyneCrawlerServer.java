@@ -1,11 +1,9 @@
 package edu.iit.swyne.crawler.test;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.InvalidPropertiesFormatException;
-import java.util.Properties;
 
 import junit.framework.TestCase;
 import edu.iit.swyne.crawler.server.SwyneCrawlerServer;
@@ -13,18 +11,16 @@ import edu.iit.swyne.crawler.server.SwyneCrawlerServer.FeedAlreadyTrackedExcepti
 
 public class TestSwyneCrawlerServer extends TestCase {
 	private URL feedURL;
-	private Properties testProps = new Properties();
+//	private Properties testProps = new Properties();
 	private SwyneCrawlerServer server;
 	
 	public TestSwyneCrawlerServer() throws InvalidPropertiesFormatException, FileNotFoundException, IOException{
 		feedURL = new URL("http://omega.cs.iit.edu/~orawling/iproTesting/news.rss");
-		testProps = new Properties();
-		testProps.loadFromXML(new FileInputStream("config/default_crawler_props.xml"));
 	}
 	
 	@Override
 	protected void setUp() throws Exception {
-		server = new SwyneCrawlerServer(testProps);
+		server = new SwyneCrawlerServer();
 		server.init();
 	}
 	

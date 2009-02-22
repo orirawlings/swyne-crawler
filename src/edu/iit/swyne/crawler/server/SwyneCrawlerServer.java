@@ -39,7 +39,7 @@ public class SwyneCrawlerServer {
 		defaultProps.setProperty("feeds.pollingInterval", DEFAULT_POLLING_INTERVAL_SECS);
 		defaultProps.setProperty("indexer.class", DEFAULT_INDEXER);
 		
-		this.props = new Properties();
+		this.props = new Properties(defaultProps);
 		this.props.putAll(props);
 	}
 	
