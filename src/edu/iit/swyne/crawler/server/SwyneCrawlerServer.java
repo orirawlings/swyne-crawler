@@ -29,12 +29,22 @@ public class SwyneCrawlerServer {
 	protected Properties props;
 	protected Indexer indexer;
 	
-	@SuppressWarnings("unchecked")
-	private Map<URL, ScheduledFuture> feedTasks = Collections.synchronizedMap(new HashMap<URL, ScheduledFuture>());
+	private Map<URL, ScheduledFuture<?>> feedTasks = Collections.synchronizedMap(new HashMap<URL, ScheduledFuture<?>>());
 	private ScheduledExecutorService scheduler;
 
 	public SwyneCrawlerServer(Properties props) {
-		this.props = props;
+		Properties defaultProps = new Properties();
+		defaultProps.setProperty("server.port", DEFAULT_PORT);
+		defaultProps.setProperty("server.maxThreads", DEFAULT_MAX_THREADS);
+		defaultProps.setProperty("feeds.pollingInterval", DEFAULT_POLLING_INTERVAL_SECS);
+		defaultProps.setProperty("indexer.class", DEFAULT_INDEXER);
+		
+		this.props = new Properties();
+		this.props.putAll(props);
+	}
+	
+	public SwyneCrawlerServer() {
+		this(new Properties());
 	}
 
 	public synchronized void init() {
@@ -106,22 +116,14 @@ public class SwyneCrawlerServer {
 		return feedTasks.containsKey(feedURL);
 	}
 
-	@SuppressWarnings("unchecked")
 	public synchronized void removeFeed(URL feedURL) {
-		ScheduledFuture feedJob = feedTasks.remove(feedURL);
+		ScheduledFuture<?> feedJob = feedTasks.remove(feedURL);
 		feedJob.cancel(false);
 	}
 	
 	public static void main(String[] args) {
-		// Build the default properties for the server
-		Properties defaultProps = new Properties();
-		defaultProps.setProperty("server.port", DEFAULT_PORT);
-		defaultProps.setProperty("server.maxThreads", DEFAULT_MAX_THREADS);
-		defaultProps.setProperty("feeds.pollingInterval", DEFAULT_POLLING_INTERVAL_SECS);
-		defaultProps.setProperty("indexer.class", DEFAULT_INDEXER);
+		Properties props = new Properties();
 		
-		// Construct the actual properties, relying on default properties where attributes are undefined
-		Properties props = new Properties(defaultProps);
 		// If a file path is specified on the command-line, load that file into properties
 		if (args.length > 0)
 			try {
