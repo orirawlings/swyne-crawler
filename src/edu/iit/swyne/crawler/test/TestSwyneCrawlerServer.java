@@ -1,7 +1,10 @@
 package edu.iit.swyne.crawler.test;
 
-import java.net.MalformedURLException;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URL;
+import java.util.InvalidPropertiesFormatException;
 import java.util.Properties;
 
 import junit.framework.TestCase;
@@ -9,16 +12,14 @@ import edu.iit.swyne.crawler.server.SwyneCrawlerServer;
 import edu.iit.swyne.crawler.server.SwyneCrawlerServer.FeedAlreadyTrackedException;
 
 public class TestSwyneCrawlerServer extends TestCase {
-	URL feedURL;
+	private URL feedURL;
 	private Properties testProps = new Properties();
 	private SwyneCrawlerServer server;
 	
-	public TestSwyneCrawlerServer() throws MalformedURLException{
+	public TestSwyneCrawlerServer() throws InvalidPropertiesFormatException, FileNotFoundException, IOException{
 		feedURL = new URL("http://omega.cs.iit.edu/~orawling/iproTesting/news.rss");
-		testProps.setProperty("server.socket", "6970");
-		testProps.setProperty("indexer.class", "edu.iit.swyne.crawler.mock.MockIndexer");
-		testProps.setProperty("server.maxThreads", "5");
-		testProps.setProperty("feeds.pollingInterval", "600");
+		testProps = new Properties();
+		testProps.loadFromXML(new FileInputStream("config/default_crawler_props.xml"));
 	}
 	
 	@Override

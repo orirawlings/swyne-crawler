@@ -8,6 +8,7 @@ public class AllTests {
 		TestSuite suite = new TestSuite("All tests for edu.iit.swyne.crawler");
 
 		suite.addTestSuite(TestTextExtractor.class);
+		suite.addTestSuite(TestSwyneIndexer.class);
 		suite.addTestSuite(TestFeedListener.class);
 		suite.addTestSuite(TestSwyneCrawlerServer.class);
 		suite.addTestSuite(TestSwyneCrawlerServerProtocol.class);

@@ -37,6 +37,7 @@ public class MockSwyneServer extends Thread {
 				System.out.println(line);
 				result += line+"\n";
 			}
+			System.out.println();
 			
 			in.close();
 			out.close();
@@ -46,7 +47,6 @@ public class MockSwyneServer extends Thread {
 			e.printStackTrace();
 		}
 		setMessage(result);
-//		System.exit(0);
 	}
 
 	private synchronized void setMessage(String message) {
