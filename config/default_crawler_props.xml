@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
-<properties>
-	<comment>Default Properties</comment>
-	<entry key="indexer.class">edu.iit.swyne.crawler.mock.MockIndexer</entry>
-	<entry key="server.port">6970</entry>
-	<entry key="server.maxThreads">5</entry>
-	<entry key="feeds.pollingInterval">3600</entry>
-</properties>
