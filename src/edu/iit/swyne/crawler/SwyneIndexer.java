@@ -4,16 +4,18 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Properties;
 
 
-public class SwyneIndexer implements Indexer {
+public class SwyneIndexer extends Indexer {
 
 	private String host;
 	private int port;
 
-	public SwyneIndexer(String host, int port) {
-		this.host = host;
-		this.port = port;
+	public SwyneIndexer(Properties props) {
+		super(props);
+		this.host = this.props.getProperty("crawler.indexer.host");
+		this.port = Integer.parseInt(this.props.getProperty("crawler.indexer.port"));
 	}
 
 	public void sendDocument(NewsDocument doc) {

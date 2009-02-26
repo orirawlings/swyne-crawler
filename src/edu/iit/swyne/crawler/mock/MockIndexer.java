@@ -1,16 +1,22 @@
 package edu.iit.swyne.crawler.mock;
 
 import java.util.ArrayList;
+import java.util.Properties;
 
 import edu.iit.swyne.crawler.Indexer;
 import edu.iit.swyne.crawler.NewsDocument;
 
-public class MockIndexer implements Indexer {
+public class MockIndexer extends Indexer {
 	
 	private ArrayList<NewsDocument> docs;
 	private int currentIndex = 0;
 	
 	public MockIndexer() {
+		docs = new ArrayList<NewsDocument>();
+	}
+	
+	public MockIndexer(Properties p) {
+		super(p);
 		docs = new ArrayList<NewsDocument>();
 	}
 	

@@ -3,6 +3,7 @@ package edu.iit.swyne.crawler;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
@@ -35,7 +36,7 @@ public class SwyneCrawler implements Crawler {
 		Properties defaultProps = new Properties();
 		defaultProps.setProperty("crawler.maxThreads", DEFAULT_MAX_CRAWLING_THREADS);
 		defaultProps.setProperty("crawler.pollingFrequency", DEFAULT_POLLING_INTERVAL_SECS);
-		defaultProps.setProperty("crawler.indexer", DEFAULT_INDEXER);
+		defaultProps.setProperty("crawler.indexer.class", DEFAULT_INDEXER);
 		
 		this.props = new Properties(defaultProps);
 		this.props.putAll(props);
@@ -47,10 +48,12 @@ public class SwyneCrawler implements Crawler {
 	}
 	
 
+	@SuppressWarnings("unchecked")
 	public synchronized void init() {
 		if(!this.initialized) {
 			try {
-				this.indexer = (Indexer) Class.forName(props.getProperty("crawler.indexer")).newInstance();
+				Class<Indexer> indexerClass = (Class<Indexer>) Class.forName(props.getProperty("crawler.indexer.class"));
+				this.indexer = indexerClass.getConstructor(Properties.class).newInstance(this.props);
 			} catch (InstantiationException e) {
 				System.err.println(e.getMessage());
 				e.printStackTrace();
@@ -60,6 +63,22 @@ public class SwyneCrawler implements Crawler {
 				e.printStackTrace();
 				System.exit(1);
 			} catch (ClassNotFoundException e) {
+				System.err.println(e.getMessage());
+				e.printStackTrace();
+				System.exit(1);
+			} catch (SecurityException e) {
+				System.err.println(e.getMessage());
+				e.printStackTrace();
+				System.exit(1);
+			} catch (NoSuchMethodException e) {
+				System.err.println(e.getMessage());
+				e.printStackTrace();
+				System.exit(1);
+			} catch (IllegalArgumentException e) {
+				System.err.println(e.getMessage());
+				e.printStackTrace();
+				System.exit(1);
+			} catch (InvocationTargetException e) {
 				System.err.println(e.getMessage());
 				e.printStackTrace();
 				System.exit(1);
