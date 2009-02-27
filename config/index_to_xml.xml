@@ -2,5 +2,5 @@
 <properties>
 	<comment>Index to XML</comment>
 	<entry key="crawler.indexer.class">edu.iit.swyne.crawler.XMLWriterIndexer</entry>
-	<entry key="crawler.indexer.xml.outputFile">newsDocs.xml</entry>
+	<entry key="crawler.indexer.xml.outputFile">data/newsDocs.xml</entry>
 </properties>
