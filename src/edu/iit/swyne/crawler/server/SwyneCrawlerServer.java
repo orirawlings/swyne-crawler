@@ -7,6 +7,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.Date;
 import java.util.InvalidPropertiesFormatException;
 import java.util.Properties;
 
@@ -107,7 +108,7 @@ public class SwyneCrawlerServer extends Thread implements CrawlerServer {
 				Socket s = this.serverSocket.accept();
 				
 				InetAddress addr = s.getInetAddress();
-				System.out.println("Connection from: " + addr.getHostAddress() + " " + addr.getHostName());
+				System.out.println("Connection from: " + addr.getHostAddress() + " " + addr.getHostName() + " " + new Date().toString());
 				
 				this.requestQueue.add(s);
 			} catch (SocketException e) {
