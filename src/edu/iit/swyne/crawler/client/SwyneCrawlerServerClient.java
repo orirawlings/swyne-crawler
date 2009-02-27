@@ -21,14 +21,18 @@ public class SwyneCrawlerServerClient implements Runnable {
 	}
 
 	public void run() {
-		Socket server = null;
+		Socket socket = null;
 		PrintWriter out = null;
 		
 		try {
-			Thread.sleep(3000);
-			server = new Socket(this.host, this.port);
-			out = new PrintWriter(server.getOutputStream(), true);
+			Thread.sleep(2000);
+			socket = new Socket(this.host, this.port);
+			out = new PrintWriter(socket.getOutputStream(), true);
+			
 			out.println(this.command);
+			socket.shutdownOutput();
+			socket.shutdownInput();
+			
 		} catch (UnknownHostException e) {
 			System.err.println("ERROR: "+e.getMessage());
 			e.printStackTrace();
@@ -38,14 +42,11 @@ public class SwyneCrawlerServerClient implements Runnable {
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} finally {
-			out.close();
 		}
 		
 		try {
 			Thread.sleep(8000);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

@@ -36,21 +36,14 @@ public class TestFeedListener extends TestCase {
 		indexer = new MockIndexer();
 		ear = new FeedListener(url);
 		ear.setIndexer(indexer);
+		
+		ear.destroyCache();
 	}
 	
 	protected void tearDown() throws Exception {
-		ear.destroyCache();
 		url = null;
 		indexer = null;
 		ear = null;
-	}
-	
-	public void testDoesntResubmitEntries() throws Exception {
-		ear.run();
-		assertEquals(10, ((MockIndexer)indexer).getNumArticles());
-		ear.run();
-		//Still just ten articles submitted
-		assertEquals(10, ((MockIndexer)indexer).getNumArticles());
 	}
 	
 	public void testSimpleListen() throws Exception {
@@ -58,4 +51,11 @@ public class TestFeedListener extends TestCase {
 		assertEquals(10, ((MockIndexer)indexer).getNumArticles());
 	}
 
+	public void testDoesntResubmitEntries() throws Exception {
+		ear.run();
+		assertEquals(10, ((MockIndexer)indexer).getNumArticles());
+		ear.run();
+		//Still just ten articles submitted
+		assertEquals(10, ((MockIndexer)indexer).getNumArticles());
+	}
 }

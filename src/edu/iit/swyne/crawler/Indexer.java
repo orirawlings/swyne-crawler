@@ -9,7 +9,9 @@ public abstract class Indexer {
 		this.props = props;
 	}
 	
-	public Indexer() {}
+	public Indexer() {
+		this(new Properties());
+	}
 	
 	public abstract void sendDocument(NewsDocument doc);
 }

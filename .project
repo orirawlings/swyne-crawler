@@ -14,4 +14,11 @@
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>config</name>
+			<type>2</type>
+			<location>/Users/orirawlings/Documents/School/IPRO-327/code/crawler/config</location>
+		</link>
+	</linkedResources>
 </projectDescription>

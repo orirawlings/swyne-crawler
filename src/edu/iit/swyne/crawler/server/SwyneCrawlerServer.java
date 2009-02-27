@@ -1,10 +1,13 @@
 package edu.iit.swyne.crawler.server;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.InvalidPropertiesFormatException;
 import java.util.Properties;
 
 import edu.iit.swyne.crawler.SwyneCrawler;
@@ -130,7 +133,24 @@ public class SwyneCrawlerServer extends Thread implements CrawlerServer {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		SwyneCrawlerServer server = new SwyneCrawlerServer();
+		Properties props = new Properties();
+		
+		// If a file path is specified on the command-line, load that file into properties
+		if (args.length > 0)
+			try {
+				props.loadFromXML(new FileInputStream(args[0]));
+			} catch (InvalidPropertiesFormatException e) {
+				System.err.println("ERROR: "+e.getMessage());
+				e.printStackTrace();
+			} catch (FileNotFoundException e) {
+				System.err.println("ERROR: "+e.getMessage());
+				e.printStackTrace();
+			} catch (IOException e) {
+				System.err.println("ERROR: "+e.getMessage());
+				e.printStackTrace();
+			}
+			
+		SwyneCrawlerServer server = new SwyneCrawlerServer(props);
 		server.startServer();
 	}
 

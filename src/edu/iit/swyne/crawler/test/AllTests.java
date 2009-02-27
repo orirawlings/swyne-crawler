@@ -9,6 +9,7 @@ public class AllTests {
 
 		suite.addTestSuite(TestTextExtractor.class);
 		suite.addTestSuite(TestSwyneIndexer.class);
+		suite.addTestSuite(TestXMLWriterIndexer.class);
 		suite.addTestSuite(TestFeedListener.class);
 		suite.addTestSuite(TestSwyneCrawler.class);
 		suite.addTestSuite(TestSwyneCrawlerServerProtocol.class);

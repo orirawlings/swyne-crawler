@@ -17,21 +17,23 @@ public class SwyneCrawlerServerThread implements RequestHandler {
 	public void handleRequest(Socket socket) {
 		BufferedReader in;
 		PrintWriter out;
-		String line, response = SwyneCrawlerServer.NAME+" "+SwyneCrawlerServer.VERSION, message = "";
+		String line, header = SwyneCrawlerServer.NAME+" "+SwyneCrawlerServer.VERSION;
 		
 		try {
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			out = new PrintWriter(socket.getOutputStream(), true);
 			
+			out.println(header);
+			
 			while ((line = in.readLine()) != null)
-				message += line + "\n";
+				out.println(SwyneCrawlerServerProtocol.run(line, this.server));
+			socket.shutdownInput();
+			socket.shutdownOutput();
 			
-			response = SwyneCrawlerServerProtocol.run(message, this.server);
-			out.println(response);
-			
-			in.close();
 			out.close();
+			in.close();
 			socket.close();
+			
 		} catch (IOException e) {
 			System.err.println("ERROR: Problem connecting with client");
 			e.printStackTrace();
