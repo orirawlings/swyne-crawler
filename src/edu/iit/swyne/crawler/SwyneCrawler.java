@@ -117,15 +117,12 @@ public class SwyneCrawler implements Crawler {
 		}
 	}
 
-	public synchronized void addFeed(URL feedURL) throws FeedAlreadyTrackedException{
-		if (!this.isRunning()) {
+	public synchronized void addFeed(URL feedURL, String collection, ArticleExtractor extractor) throws FeedAlreadyTrackedException {
+		if (!this.isRunning())
 			this.start();
-		}
-		FeedListener listener = new FeedListener(feedURL);
-		listener.setIndexer(indexer);
-		if (!feedTasks.containsKey(feedURL)) {
+		FeedListener listener = new FeedListener(feedURL, collection, extractor, indexer);
+		if (!feedTasks.containsKey(feedURL))
 			feedTasks.put(feedURL, scheduler.scheduleWithFixedDelay(listener, 0, Integer.parseInt(props.getProperty("crawler.pollingFrequency")), TimeUnit.SECONDS));
-		}
 		else throw new FeedAlreadyTrackedException("Feed " + feedURL.toString() + " has been previously added.");
 	}
 

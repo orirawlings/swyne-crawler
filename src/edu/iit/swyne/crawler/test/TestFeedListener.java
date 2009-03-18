@@ -9,6 +9,7 @@ import java.net.URL;
 import junit.framework.TestCase;
 import edu.iit.swyne.crawler.FeedListener;
 import edu.iit.swyne.crawler.Indexer;
+import edu.iit.swyne.crawler.LATimesExtractor;
 import edu.iit.swyne.crawler.mock.MockIndexer;
 
 /**
@@ -34,7 +35,7 @@ public class TestFeedListener extends TestCase {
 			mue.printStackTrace();
 		}
 		indexer = new MockIndexer();
-		ear = new FeedListener(url);
+		ear = new FeedListener(url, "LA Times", new LATimesExtractor(), indexer);
 		ear.setIndexer(indexer);
 		
 		ear.destroyCache();

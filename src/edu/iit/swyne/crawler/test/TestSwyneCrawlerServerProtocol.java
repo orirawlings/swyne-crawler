@@ -10,16 +10,19 @@ import edu.iit.swyne.crawler.server.CrawlerServer;
 import edu.iit.swyne.crawler.server.SwyneCrawlerServerProtocol;
 
 public class TestSwyneCrawlerServerProtocol extends TestCase {
+	private static final String COLLECTION = "LATimes";
 	private final String SERVER_CLASS = "edu.iit.swyne.crawler.mock.MockCrawlerServer";
-//	private final String SERVER_CLASS = "edu.iit.swyne.crawler.SwyneCrawlerServer";
-	
+	private final String EXTRACTOR_CLASS = "edu.iit.swyne.crawler.LATimesExtractor";
+		
 	private Properties props = new Properties();
 	private URL feedURL;
 	private CrawlerServer server;
-	
+	private String addDirective;
+		
 	public TestSwyneCrawlerServerProtocol() throws MalformedURLException {
 		feedURL = new URL("http://omega.cs.iit.edu/~orawling/iproTesting/news.rss");
 		props.setProperty("server.class", SERVER_CLASS);
+		addDirective = "add "+feedURL.toString()+" "+COLLECTION+" "+EXTRACTOR_CLASS;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -57,38 +60,38 @@ public class TestSwyneCrawlerServerProtocol extends TestCase {
 		assertTrue(server.isRunning());
 	}
 	
-	public void testUnexpectedError() throws Exception {
+	public void testServerNotRunning() throws Exception {
 		server.stopServer();
 		assertFalse(server.isRunning());
 		
-		String command = "add "+feedURL.toString();
-		assertEquals(SwyneCrawlerServerProtocol.UNEXPECTED_ERROR_MESSAGE+" \"Swyne crawler server not running.\"\n", SwyneCrawlerServerProtocol.run(command, server));
+		String command = addDirective;
+		assertEquals(SwyneCrawlerServerProtocol.SERVER_FAILURE_MESSAGE+" \"Swyne crawler server not running.\"\n", SwyneCrawlerServerProtocol.run(command, server));
 	}
 	
 	public void testAddFeed() throws Exception {
-		String command = "add "+feedURL.toString();
+		String command = addDirective;
 		
 		assertEquals(SwyneCrawlerServerProtocol.ADD_SUCCESS_MESSAGE+" "+feedURL.toString()+"\n", SwyneCrawlerServerProtocol.run(command, server));
 		assertTrue(server.getCrawler().isTrackingFeed(feedURL));
 	}
 	
 	public void testAddFeedTwice() throws Exception {
-		String command = "add "+feedURL.toString();
+		String command = addDirective;
 		
 		assertEquals(SwyneCrawlerServerProtocol.ADD_SUCCESS_MESSAGE+" "+feedURL.toString()+"\n", SwyneCrawlerServerProtocol.run(command, server));
 		assertTrue(server.getCrawler().isTrackingFeed(feedURL));
 		
-		assertEquals(SwyneCrawlerServerProtocol.ADD_FAILURE_MESSAGE_ALREADY_TRACKED+" "+"Feed " + feedURL.toString() + " has been previously added.\n", SwyneCrawlerServerProtocol.run(command, server));
+		assertEquals(SwyneCrawlerServerProtocol.ADD_FAILURE_MESSAGE_ALREADY_TRACKED+" \"Feed " + feedURL.toString() + " has been previously added.\"\n", SwyneCrawlerServerProtocol.run(command, server));
 	}
 	
-	public void testAddingFeedWithoutURL() throws Exception {
+	public void testAddingWithoutEnoughArgs() throws Exception {
 		String command = "add";
 		
-		assertEquals(SwyneCrawlerServerProtocol.ADD_FAILURE_MESSAGE_NO_URL_GIVEN+"\n", SwyneCrawlerServerProtocol.run(command, server));
+		assertEquals(SwyneCrawlerServerProtocol.ADD_FAILURE_MESSAGE_NOT_ENOUGH_ARGS+"\n", SwyneCrawlerServerProtocol.run(command, server));
 	}
 
 	public void testRemoveFeed() throws Exception {
-		String command = "add "+feedURL.toString();
+		String command = addDirective;
 		
 		SwyneCrawlerServerProtocol.run(command, server);
 		assertTrue(server.getCrawler().isTrackingFeed(feedURL));

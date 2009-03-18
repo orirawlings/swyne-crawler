@@ -10,13 +10,18 @@ import edu.iit.swyne.crawler.server.SwyneCrawlerServer;
 
 public class TestSwyneCrawlerServerSocketInterface extends TestCase {
 	
+	private static final String COLLECTION = "LATimes";
+	private static final String EXTRACTOR_CLASS = "edu.iit.swyne.crawler.LATimesExtractor";
+	
 	private SwyneCrawlerServerClient client;
 	private URL feedURL;
 	private CrawlerServer server;
+	private String addDirective;
 	
 	public TestSwyneCrawlerServerSocketInterface() throws MalformedURLException {
 		feedURL = new URL("http://omega.cs.iit.edu/~orawling/iproTesting/news.rss");
 		client = new SwyneCrawlerServerClient("localhost", 6970);
+		addDirective = "add "+feedURL.toString()+" "+COLLECTION+" "+EXTRACTOR_CLASS;
 	}
 	
 	@Override
@@ -31,7 +36,7 @@ public class TestSwyneCrawlerServerSocketInterface extends TestCase {
 	}
 
 	public void testAddFeed() throws Exception {
-		client.setCommand("add "+feedURL.toString());
+		client.setCommand(addDirective);
 		assertTrue(server.isRunning());
 		client.run();
 		assertTrue(server.getCrawler().isTrackingFeed(feedURL));
@@ -45,7 +50,7 @@ public class TestSwyneCrawlerServerSocketInterface extends TestCase {
 	}
 	
 	public void testRemoveFeed() throws Exception {
-		client.setCommand("add "+feedURL.toString());
+		client.setCommand(addDirective);
 		assertTrue(server.isRunning());
 		client.run();
 		assertTrue(server.getCrawler().isTrackingFeed(feedURL));

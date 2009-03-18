@@ -3,16 +3,16 @@ package edu.iit.swyne.crawler.test;
 import java.util.Date;
 
 import edu.iit.swyne.crawler.NewsDocument;
-import edu.iit.swyne.crawler.TextExtractor;
+import edu.iit.swyne.crawler.LATimesExtractor;
 import junit.framework.TestCase;
 
 public class TestTextExtractor extends TestCase {
-	private TextExtractor extractor;
+	private LATimesExtractor extractor;
 	private String source, title, collection, article;
 	private Date publishedDate;
 	
 	protected void setUp() throws Exception {
-		extractor = new TextExtractor();
+		extractor = new LATimesExtractor();
 	}
 	
 	public void testSimpleLATimesExtraction() throws Exception {

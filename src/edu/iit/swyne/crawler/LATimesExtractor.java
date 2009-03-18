@@ -11,7 +11,7 @@ import org.htmlparser.tags.Div;
 import org.htmlparser.util.NodeList;
 import org.htmlparser.util.ParserException;
 
-public class TextExtractor {
+public class LATimesExtractor implements ArticleExtractor {
 	
 	private Pattern garbageText = Pattern.compile("^\\s*$|^(&nbsp;)+$|^&raquo;&nbsp;Discuss Article$|^\\(\\d+ Comments\\)$");
 
