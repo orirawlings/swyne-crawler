@@ -30,6 +30,7 @@ public class SwyneCrawlerServerClient implements Runnable {
 			out = new PrintWriter(socket.getOutputStream(), true);
 			
 			out.println(this.command);
+			
 			socket.shutdownOutput();
 			socket.shutdownInput();
 			

@@ -11,7 +11,7 @@ import edu.iit.swyne.crawler.server.SwyneCrawlerServer;
 public class TestSwyneCrawlerServerSocketInterface extends TestCase {
 	
 	private static final String COLLECTION = "LATimes";
-	private static final String EXTRACTOR_CLASS = "edu.iit.swyne.crawler.LATimesExtractor";
+	private static final String EXTRACTOR_CLASS = "edu.iit.swyne.crawler.extractor.LATimesExtractor";
 	
 	private SwyneCrawlerServerClient client;
 	private URL feedURL;

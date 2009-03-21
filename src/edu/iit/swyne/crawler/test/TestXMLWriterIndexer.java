@@ -20,7 +20,7 @@ public class TestXMLWriterIndexer extends TestCase {
 	
 	private NewsDocument doc = new NewsDocument();
 	private XMLWriterIndexer indexer;
-	private String outputFile = "testData/newsDocs.xml";
+	private String outputFile = "tmp/testData.xml";
 	private String expectedXML;
 	
 	public TestXMLWriterIndexer(String name) {
