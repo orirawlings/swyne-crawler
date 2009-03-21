@@ -1,8 +1,12 @@
 package edu.iit.swyne.crawler.server;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -140,6 +144,18 @@ public class SwyneCrawlerServer extends Thread implements CrawlerServer {
 		if (args.length > 0)
 			try {
 				props.loadFromXML(new FileInputStream(args[0]));
+				
+				String errFile, outFile;
+				if ((errFile = props.getProperty("output.err.file")) != null) {
+					File err = new File(errFile);
+					if (!err.canWrite()) throw new Exception("Cannot write to specified error file");
+					System.setErr(new PrintStream(new BufferedOutputStream(new FileOutputStream(err)), true));
+				}
+				if ((outFile = props.getProperty("output.out.file")) != null) {
+					File out = new File(outFile);
+					if (!out.canWrite()) throw new Exception("Cannot write to specified output file");
+					System.setOut(new PrintStream(new BufferedOutputStream(new FileOutputStream(out)), true));
+				}
 			} catch (InvalidPropertiesFormatException e) {
 				System.err.println("ERROR: "+e.getMessage());
 				e.printStackTrace();
@@ -147,6 +163,9 @@ public class SwyneCrawlerServer extends Thread implements CrawlerServer {
 				System.err.println("ERROR: "+e.getMessage());
 				e.printStackTrace();
 			} catch (IOException e) {
+				System.err.println("ERROR: "+e.getMessage());
+				e.printStackTrace();
+			} catch (Exception e) {
 				System.err.println("ERROR: "+e.getMessage());
 				e.printStackTrace();
 			}
