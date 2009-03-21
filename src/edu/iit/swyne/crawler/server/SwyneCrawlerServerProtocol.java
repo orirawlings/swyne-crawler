@@ -6,7 +6,6 @@ import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import edu.iit.swyne.crawler.ArticleExtractor;
 import edu.iit.swyne.crawler.FeedAlreadyTrackedException;
 
 public class SwyneCrawlerServerProtocol {
@@ -75,8 +74,8 @@ public class SwyneCrawlerServerProtocol {
 					else {
 						URL feedURL = new URL(args[1]);
 						String collection = args[2];
-						ArticleExtractor extractor = (ArticleExtractor) Class.forName(args[3]).newInstance();
-						server.getCrawler().addFeed(feedURL, collection, extractor);
+						String extractorClass = args[3];
+						server.getCrawler().addFeed(feedURL, collection, extractorClass);
 						response += !server.getCrawler().isTrackingFeed(feedURL) ? ADD_FAILURE_MESSAGE : ADD_SUCCESS_MESSAGE+" "+feedURL.toString();
 					}
 				}
@@ -98,10 +97,6 @@ public class SwyneCrawlerServerProtocol {
 			response += ADD_FAILURE_MESSAGE_ALREADY_TRACKED + " \"" + e.getMessage() + "\"\n";
 		} catch (MalformedURLException e) {
 			response += BAD_URL_FAILURE_MESSAGE + " \"" + e.getMessage() + "\"\n";
-		} catch (InstantiationException e) {
-			response += ADD_FAILURE_MESSAGE_EXTRACTOR_INSTANTIATION + " \"" + e.getMessage() + "\"\n";
-		} catch (IllegalAccessException e) {
-			response += ADD_FAILURE_MESSAGE_ILLEGAL_ACCESS + " \"" + e.getMessage() + "\"\n";
 		} catch (ClassNotFoundException e) {
 			response += ADD_FAILURE_MESSAGE_EXTRACTOR_NOT_FOUND + " \"" + e.getMessage() + "\"\n";
 		} catch (IOException e) {

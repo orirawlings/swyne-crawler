@@ -1,5 +1,6 @@
-package edu.iit.swyne.crawler;
+package edu.iit.swyne.crawler.extractor;
 
+import java.net.URL;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -11,18 +12,22 @@ import org.htmlparser.tags.Div;
 import org.htmlparser.util.NodeList;
 import org.htmlparser.util.ParserException;
 
-public class LATimesExtractor implements ArticleExtractor {
+import edu.iit.swyne.crawler.NewsDocument;
+
+public class LATimesExtractor extends ArticleExtractor {
 	
 	private Pattern garbageText = Pattern.compile("^\\s*$|^(&nbsp;)+$|^&raquo;&nbsp;Discuss Article$|^\\(\\d+ Comments\\)$");
 
-	public NewsDocument parseArticle(String link, String title,
-			Date publishedDate, String collection) {
-		
+	public LATimesExtractor(URL link, String title, Date date, String collection) {
+		super(link, title, date, collection);
+	}
+	
+	public NewsDocument parseArticle() {
 		String article = "";
-		
 		Parser parser = new Parser();
+		
 		try {
-			parser.setURL(link);
+			parser.setURL(articleURL.toString());
 			NodeList nList = parser.extractAllNodesThatMatch(new StorybodyFilter());
 			for (int i = 0; i < nList.size(); i++) {
 				Node node = nList.elementAt(i);
@@ -46,9 +51,9 @@ public class LATimesExtractor implements ArticleExtractor {
 		}
 		
 		NewsDocument result = new NewsDocument();
-		result.setSource(link);
-		result.setPublishedDate(publishedDate);
-		result.setTitle(title.trim());
+		result.setSource(articleURL.toString());
+		result.setPublishedDate(articleDate);
+		result.setTitle(articleTitle.trim());
 		result.setCollection(collection);		
 		result.setArticle(article.trim());
 		

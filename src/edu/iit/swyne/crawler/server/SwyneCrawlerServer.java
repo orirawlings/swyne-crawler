@@ -148,11 +148,15 @@ public class SwyneCrawlerServer extends Thread implements CrawlerServer {
 				String errFile, outFile;
 				if ((errFile = props.getProperty("output.err.file")) != null) {
 					File err = new File(errFile);
+					err.getParentFile().mkdirs();
+					err.createNewFile();
 					if (!err.canWrite()) throw new Exception("Cannot write to specified error file");
 					System.setErr(new PrintStream(new BufferedOutputStream(new FileOutputStream(err)), true));
 				}
 				if ((outFile = props.getProperty("output.out.file")) != null) {
 					File out = new File(outFile);
+					out.getParentFile().mkdirs();
+					out.createNewFile();
 					if (!out.canWrite()) throw new Exception("Cannot write to specified output file");
 					System.setOut(new PrintStream(new BufferedOutputStream(new FileOutputStream(out)), true));
 				}

@@ -3,7 +3,6 @@ package edu.iit.swyne.crawler.mock;
 import java.net.URL;
 import java.util.HashMap;
 
-import edu.iit.swyne.crawler.ArticleExtractor;
 import edu.iit.swyne.crawler.Crawler;
 import edu.iit.swyne.crawler.FeedAlreadyTrackedException;
 
@@ -48,7 +47,7 @@ public class MockCrawler implements Crawler {
 		return this.trackedFeeds.size();
 	}
 
-	public void addFeed(URL feedURL, String collection, ArticleExtractor extractor) throws FeedAlreadyTrackedException {
+	public void addFeed(URL feedURL, String collection, String extractorClass) throws FeedAlreadyTrackedException, ClassNotFoundException {
 		if (this.trackedFeeds.containsKey(feedURL) && this.trackedFeeds.get(feedURL).booleanValue())
 			throw new FeedAlreadyTrackedException("Feed " + feedURL.toString() + " has been previously added.");
 		this.trackedFeeds.put(feedURL, new Boolean(true));		

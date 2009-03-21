@@ -9,7 +9,6 @@ import junit.framework.TestCase;
 import edu.iit.swyne.crawler.Crawler;
 import edu.iit.swyne.crawler.FeedAlreadyTrackedException;
 import edu.iit.swyne.crawler.SwyneCrawler;
-import edu.iit.swyne.crawler.LATimesExtractor;
 
 public class TestSwyneCrawler extends TestCase {
 	private URL feedURL;
@@ -41,22 +40,22 @@ public class TestSwyneCrawler extends TestCase {
 	public void testAddFeedBeforeStartingCrawler() throws Exception {
 		// The crawler should start up if a request to add a feed has been made
 		assertFalse(this.crawler.isRunning());
-		this.crawler.addFeed(feedURL, "LA Times", new LATimesExtractor());
+		this.crawler.addFeed(feedURL, "LA Times", "edu.iit.swyne.crawler.extractor.LATimesExtractor");
 		assertTrue(this.crawler.isRunning());
 	}
 	
 	public void testAddFeed() throws Exception {
 		this.crawler.start();
-		this.crawler.addFeed(feedURL, "LA Times", new LATimesExtractor());
+		this.crawler.addFeed(feedURL, "LA Times", "edu.iit.swyne.crawler.extractor.LATimesExtractor");
 		assertEquals(1, this.crawler.numFeedsTracking());
 		assertTrue(this.crawler.isTrackingFeed(feedURL));
 	}
 	
 	public void testAddFeedTwice() throws Exception {
 		this.crawler.start();
-		this.crawler.addFeed(feedURL, "LA Times", new LATimesExtractor());
+		this.crawler.addFeed(feedURL, "LA Times", "edu.iit.swyne.crawler.extractor.LATimesExtractor");
 		try {
-			this.crawler.addFeed(feedURL, "LA Times", new LATimesExtractor());
+			this.crawler.addFeed(feedURL, "LA Times", "edu.iit.swyne.crawler.extractor.LATimesExtractor");
 			fail();
 		}
 		catch(FeedAlreadyTrackedException e) {
@@ -68,7 +67,7 @@ public class TestSwyneCrawler extends TestCase {
 	
 	public void testRemoveFeed() throws Exception {
 		this.crawler.start();
-		this.crawler.addFeed(feedURL, "LA Times", new LATimesExtractor());
+		this.crawler.addFeed(feedURL, "LA Times", "edu.iit.swyne.crawler.extractor.LATimesExtractor");
 		assertEquals(1, this.crawler.numFeedsTracking());
 		assertTrue(this.crawler.isTrackingFeed(feedURL));
 		this.crawler.removeFeed(feedURL);

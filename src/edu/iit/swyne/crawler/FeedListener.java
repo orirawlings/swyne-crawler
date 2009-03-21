@@ -1,6 +1,7 @@
 package edu.iit.swyne.crawler;
 
 import java.net.URL;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -10,6 +11,8 @@ import com.sun.syndication.fetcher.FetcherListener;
 import com.sun.syndication.fetcher.impl.FeedFetcherCache;
 import com.sun.syndication.fetcher.impl.HashMapFeedInfoCache;
 import com.sun.syndication.fetcher.impl.HttpURLFeedFetcher;
+
+import edu.iit.swyne.crawler.extractor.ArticleExtractor;
 
 /**
  * @author Ori Rawlings
@@ -24,17 +27,20 @@ public class FeedListener implements Runnable{
 	private HttpURLFeedFetcher fetcher;
 	
 	private Indexer indexer;
-	private ArticleExtractor extractor;
+//	private ArticleExtractor extractor;
 	public String collection;
+	private Class<? extends ArticleExtractor> extractorClass;
 	
-	public FeedListener(URL url, String collection, ArticleExtractor extractor, Indexer indexer) {
+	@SuppressWarnings("unchecked")
+	public FeedListener(URL url, String collection, String extractorClass, Indexer indexer) throws ClassNotFoundException {
 		this.url = url;
 		cache = HashMapFeedInfoCache.getInstance();
 		fetcher = new HttpURLFeedFetcher(cache);
 		fetcher.addFetcherEventListener(new FetchListenImpl());
 		
 		this.collection = collection;
-		this.extractor = extractor;
+//		this.extractor = extractor;
+		this.extractorClass = (Class<? extends ArticleExtractor>) Class.forName(extractorClass);
 		this.indexer = indexer;
 	}
 	
@@ -48,9 +54,9 @@ public class FeedListener implements Runnable{
 		}
 	}
 
-	public synchronized void runMethod() throws IndexerNotDefinedException, ArticleExtractorNotDefinedException {
+	public synchronized void runMethod() throws IndexerNotDefinedException {
 		if (indexer == null) throw new IndexerNotDefinedException("No indexer has been set for this feed listener.");
-		if (extractor == null) throw new ArticleExtractorNotDefinedException("No article extractor has been set for this feed listener.");
+//		if (extractor == null) throw new ArticleExtractorNotDefinedException("No article extractor has been set for this feed listener.");
 		
 		try {
 			fetcher.retrieveFeed(url);
@@ -76,12 +82,12 @@ public class FeedListener implements Runnable{
 		this.indexer = indexer;
 	}
 	
-	public ArticleExtractor getExtractor() {
-		return extractor;
+	public Class<? extends ArticleExtractor> getExtractorClass() {
+		return extractorClass;
 	}
 
-	public void setExtractor(ArticleExtractor extractor) {
-		this.extractor = extractor;
+	public void setExtractor(Class<? extends ArticleExtractor> extractorClass) {
+		this.extractorClass = extractorClass;
 	}
 
 	public String getCollection() {
@@ -101,10 +107,10 @@ public class FeedListener implements Runnable{
 		private static final long serialVersionUID = 1L;
 	}
 	
-	public class ArticleExtractorNotDefinedException extends Exception {
-		private static final long serialVersionUID = 1L;
-		public ArticleExtractorNotDefinedException(String string) { super(string); }
-	}
+//	public class ArticleExtractorNotDefinedException extends Exception {
+//		private static final long serialVersionUID = 1L;
+//		public ArticleExtractorNotDefinedException(String string) { super(string); }
+//	}
 
 	private class FetchListenImpl implements FetcherListener {
 		private HashMap<SyndEntry, Boolean> entryHash;
@@ -123,8 +129,18 @@ public class FeedListener implements Runnable{
 				for (int i = l.size()-1; i >=0 ; i--) {
 					SyndEntry e = l.get(i);
 					if(entryHash.get(e) == null) {
-						NewsDocument doc = extractor.parseArticle(e.getLink(), e.getTitle(), e.getPublishedDate(), collection);
-						indexer.sendDocument(doc);
+						Class[] paramTypes = { URL.class, String.class, Date.class, String.class };
+						URL articleURL;
+						try {
+							articleURL = new URL(e.getLink());
+							Object[] params = { articleURL, e.getTitle(), e.getPublishedDate(), collection };
+							ArticleExtractor extractor = extractorClass.getConstructor(paramTypes).newInstance(params);
+							NewsDocument doc = extractor.parseArticle();
+							indexer.sendDocument(doc);
+						} catch (Exception e1) {
+							System.err.println("ERROR: "+e1.getMessage());
+							e1.printStackTrace();
+						}
 					}
 				}
 			}

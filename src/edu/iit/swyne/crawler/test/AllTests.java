@@ -7,7 +7,7 @@ public class AllTests {
 	public static Test suite() {
 		TestSuite suite = new TestSuite("All tests for edu.iit.swyne.crawler");
 
-		suite.addTestSuite(TestTextExtractor.class);
+		suite.addTestSuite(TestLATimesExtractor.class);
 		suite.addTestSuite(TestSwyneIndexer.class);
 		suite.addTestSuite(TestXMLWriterIndexer.class);
 		suite.addTestSuite(TestFeedListener.class);

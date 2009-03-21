@@ -1,26 +1,25 @@
 package edu.iit.swyne.crawler.test;
 
+import java.net.URL;
 import java.util.Date;
 
 import edu.iit.swyne.crawler.NewsDocument;
-import edu.iit.swyne.crawler.LATimesExtractor;
+import edu.iit.swyne.crawler.extractor.LATimesExtractor;
 import junit.framework.TestCase;
 
-public class TestTextExtractor extends TestCase {
+public class TestLATimesExtractor extends TestCase {
 	private LATimesExtractor extractor;
-	private String source, title, collection, article;
-	private Date publishedDate;
+	private String source = "http://feedproxy.google.com/~r/latimes/news/~3/ww9TE5mixx8/la-me-outthere6-2009feb06,0,1469200.story";
+	private String title = "Small service makes big difference on L.A.'s skid row";
+	private String collection = "LA Times";
+	private String article;
+	private Date publishedDate = new Date(1233907200000L);
 	
 	protected void setUp() throws Exception {
-		extractor = new LATimesExtractor();
+		extractor = new LATimesExtractor(new URL(source), title, publishedDate, collection);
 	}
 	
 	public void testSimpleLATimesExtraction() throws Exception {
-		title = "Small service makes big difference on L.A.'s skid row";
-		source = "http://feedproxy.google.com/~r/latimes/news/~3/ww9TE5mixx8/la-me-outthere6-2009feb06,0,1469200.story";
-		collection = "LA times";
-		publishedDate = new Date(1233907200000L);
-	
 		article = "";
 		article += "The trappings of the lives of Krystle Marage and her three daughters are not unusual. There are hairbrushes and loofah sponges; Game Boys and skateboards; school books and Bibles; clothes, clothes and more clothes. These days, they have to fit it all inside four trash cans, which sit alongside 500 others in a dank warehouse, around the corner from a frozen fish distributor and a cheap hotel.\n";
 		article += "Marage, 46, grew up on a pig-and-chicken farm in Belize. The girls' father checked out long ago, she said. She's never had money, not in Belize, not in New York, where she  immigrated in 1993, and not in L.A., where she arrived last year after friends convinced her there were jobs to be had. She's always made it, one way or another.\n";
@@ -52,7 +51,7 @@ public class TestTextExtractor extends TestCase {
 		article += "It was supposed to go on the wall, but Mishy has nowhere to hang it. So she put it in her bin, No. 287. It's still in there, hidden away in a room that never seems to get warm, under roosting pigeons and yellowing rolls of flypaper.\n";
 		article += "scott.gold@latimes.com";
 				
-		NewsDocument doc = extractor.parseArticle(source, title, publishedDate, collection);
+		NewsDocument doc = extractor.parseArticle();
 		
 		assertEquals(article, doc.getArticle());
 	}

@@ -3,4 +3,6 @@
 	<comment>Index to XML</comment>
 	<entry key="crawler.indexer.class">edu.iit.swyne.crawler.XMLWriterIndexer</entry>
 	<entry key="crawler.indexer.xml.outputFile">data/newsDocs.xml</entry>
+	<entry key="output.err.file">tmp/errLog.txt</entry>
+	<entry key="output.out.file">tmp/log.txt</entry>
 </properties>
