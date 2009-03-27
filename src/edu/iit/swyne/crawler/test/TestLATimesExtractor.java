@@ -48,8 +48,7 @@ public class TestLATimesExtractor extends TestCase {
 		article += "Still, the transition has been tough on them all. They often have to walk to two different missions to fill up on dinner; that practice is frowned upon, but some missions, hurting financially like everyone else, have begun scaling back their meal portions.\n";
 		article += "The experience has been especially hard on Mishanta, the youngest, who hasn't been talking much lately, though she periodically tells her mother: \"I can't take it anymore.\"\n";
 		article += "Mishy, as her sisters call her, is a talented artist. This week, a friend at school gave her an early birthday present, a clock decorated with Japanese-style anime characters.\n";
-		article += "It was supposed to go on the wall, but Mishy has nowhere to hang it. So she put it in her bin, No. 287. It's still in there, hidden away in a room that never seems to get warm, under roosting pigeons and yellowing rolls of flypaper.\n";
-		article += "scott.gold@latimes.com";
+		article += "It was supposed to go on the wall, but Mishy has nowhere to hang it. So she put it in her bin, No. 287. It's still in there, hidden away in a room that never seems to get warm, under roosting pigeons and yellowing rolls of flypaper.";
 				
 		NewsDocument doc = extractor.parseArticle();
 		

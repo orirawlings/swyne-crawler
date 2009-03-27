@@ -53,7 +53,7 @@ public class TestXMLWriterIndexer extends TestCase {
 		indexer.sendDocument(doc);
 		
 		String line, fileContents = "";
-		BufferedReader in = new BufferedReader(new FileReader("testData/newsDocs.xml"));
+		BufferedReader in = new BufferedReader(new FileReader(outputFile));
 		while((line = in.readLine()) != null) {
 			fileContents += line+"\n";
 		}
