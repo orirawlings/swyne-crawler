@@ -29,7 +29,8 @@ public class SwyneCrawlerServerProtocol {
 	private static final String COMMAND_SHUTDOWN	= "shutdown";
 	private static final String COMMAND_ADD			= "add";
 	private static final String COMMAND_REMOVE		= "remove";
-	
+	private static final String COMMAND_EXIT		= "exit";
+
 	private static final String ADD_USAGE = "add <url> <collection> <extractor class>";
 
 	public static final String SHUTDOWN_SUCCESS_MESSAGE							= SHUTDOWN_SUCCESS + " Shutdown Success";
@@ -88,6 +89,8 @@ public class SwyneCrawlerServerProtocol {
 						response += server.getCrawler().isTrackingFeed(feedURL) ? REMOVE_FAILURE_MESSAGE : REMOVE_SUCCESS_MESSAGE+" "+feedURL.toString();
 					}
 				}
+				else if (args[0].compareToIgnoreCase(COMMAND_EXIT) == 0)
+					return response;
 				else response += UNKNOWN_COMMAND_MESSAGE+" \""+line+"\"";
 				
 				response += "\n";

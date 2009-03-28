@@ -100,4 +100,11 @@ public class TestSwyneCrawlerServerProtocol extends TestCase {
 		assertEquals(SwyneCrawlerServerProtocol.REMOVE_SUCCESS_MESSAGE+" "+feedURL.toString()+"\n", SwyneCrawlerServerProtocol.run(command, server));
 		assertFalse(server.getCrawler().isTrackingFeed(feedURL));
 	}
+	
+	public void testExit() throws Exception {
+		String command = "exit\n" + addDirective;
+		
+		SwyneCrawlerServerProtocol.run(command, server);
+		assertFalse(server.getCrawler().isTrackingFeed(feedURL));
+	}
 }
