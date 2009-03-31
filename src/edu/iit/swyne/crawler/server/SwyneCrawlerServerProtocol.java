@@ -10,6 +10,14 @@ import edu.iit.swyne.crawler.FeedAlreadyTrackedException;
 
 public class SwyneCrawlerServerProtocol {
 
+	public static class ClientExitException extends Exception {
+		public ClientExitException(String string) {
+			super(string);
+		}
+
+		private static final long serialVersionUID = 1L;
+	}
+
 	@SuppressWarnings("serial")
 	private static class ServerNotRunningException extends Exception {
 		public ServerNotRunningException(String string) {
@@ -51,7 +59,7 @@ public class SwyneCrawlerServerProtocol {
 	public static final String INPUT_FAILURE_MESSAGE 							= UNEXPECTED_ERROR + " FAILURE Error reading input from socket";
 	public static final String SERVER_FAILURE_MESSAGE 							= UNEXPECTED_ERROR + " FAILURE Server error";
 
-	public static String run(String command, CrawlerServer server) {
+	public static String run(String command, CrawlerServer server) throws ClientExitException {
 		String response = "";
 		
 		BufferedReader in = new BufferedReader(new StringReader(command));
@@ -90,7 +98,7 @@ public class SwyneCrawlerServerProtocol {
 					}
 				}
 				else if (args[0].compareToIgnoreCase(COMMAND_EXIT) == 0)
-					return response;
+					throw new ClientExitException("'exit' command issued by client");
 				else response += UNKNOWN_COMMAND_MESSAGE+" \""+line+"\"";
 				
 				response += "\n";

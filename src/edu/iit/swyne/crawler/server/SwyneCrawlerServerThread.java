@@ -6,6 +6,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+import edu.iit.swyne.crawler.server.SwyneCrawlerServerProtocol.ClientExitException;
+
 public class SwyneCrawlerServerThread implements RequestHandler {
 
 	private SwyneCrawlerServer server;
@@ -25,8 +27,16 @@ public class SwyneCrawlerServerThread implements RequestHandler {
 			
 			out.println(header);
 			
-			while ((line = in.readLine()) != null)
-				out.println(SwyneCrawlerServerProtocol.run(line, this.server));
+			
+			boolean exited = false;
+			while ((line = in.readLine()) != null && !exited)
+				try {
+					out.println(SwyneCrawlerServerProtocol.run(line, this.server));
+				} catch (ClientExitException e) {
+					out.println("Goodbye");
+					exited = true;
+				}
+				
 			socket.shutdownInput();
 			socket.shutdownOutput();
 			
