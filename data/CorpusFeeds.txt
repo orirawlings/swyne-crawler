@@ -1,0 +1,5 @@
+add http://syndication.boston.com/news/local/?mode=rss_10 BostonGlobe edu.iit.swyne.crawler.extractor.BostonGlobeExtractor
+add http://feeds.chicagotribune.com/chicagotribune/news/local/ ChicagoTribune edu.iit.swyne.crawler.extractor.ChicagoTribuneExtractor
+add http://www.chron.com/rss/metropolitan/index.rss HoustonChronicle edu.iit.swyne.crawler.extractor.HoustonChronicleExtractor
+add http://feeds.latimes.com/latimes/news/local LATimes edu.iit.swyne.crawler.extractor.LATimesExtractor
+add http://www.nytimes.com/services/xml/rss/nyt/NYRegion.xml NYTimes edu.iit.swyne.crawler.extractor.NewYorkTimesExtractor

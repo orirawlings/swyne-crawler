@@ -12,7 +12,9 @@ import org.jdom.output.XMLOutputter;
 
 public class XMLWriterIndexer extends Indexer {
 	
-	private static Document xmlDoc;
+	private static final String DEFAULT_XML_OUTPUTFILE = "data/newsDocs.xml";
+	
+	protected static Document xmlDoc;
 
 	public XMLWriterIndexer(Properties props) {
 		super(props);
@@ -26,7 +28,7 @@ public class XMLWriterIndexer extends Indexer {
 
 	@Override
 	public void sendDocument(NewsDocument doc) {
-		File outputFile = new File(this.props.getProperty("crawler.indexer.xml.outputFile"));
+		File outputFile = new File(this.props.getProperty("crawler.indexer.xml.outputFile", DEFAULT_XML_OUTPUTFILE));
 		
 		Element newsDoc = new Element("document");
 		newsDoc .addContent(new Element("collection").addContent(doc.getCollection()));

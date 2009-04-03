@@ -1,0 +1,9 @@
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	<comment>Configuration to build testing corpus</comment>
+	<entry key="crawler.indexer.class">edu.iit.swyne.crawler.CorpusBuilder</entry>
+	<entry key="crawler.indexer.xml.outputFile">data/corpus/corpusNews.xml</entry>
+	<entry key="crawler.indexer.corpus.dir">data/corpus</entry><entry key="output.err.file">tmp/errLog.txt</entry>
+	<entry key="output.out.file">tmp/log.txt</entry>
+	
+</properties>

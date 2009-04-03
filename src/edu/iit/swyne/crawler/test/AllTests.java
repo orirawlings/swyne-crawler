@@ -10,6 +10,7 @@ public class AllTests {
 		suite.addTestSuite(TestLATimesExtractor.class);
 		suite.addTestSuite(TestSwyneIndexer.class);
 		suite.addTestSuite(TestXMLWriterIndexer.class);
+		suite.addTestSuite(TestCorpusBuilder.class);
 		suite.addTestSuite(TestFeedListener.class);
 		suite.addTestSuite(TestSwyneCrawler.class);
 		suite.addTestSuite(TestSwyneCrawlerServerProtocol.class);

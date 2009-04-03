@@ -8,6 +8,7 @@ import junit.framework.TestCase;
 import edu.iit.swyne.crawler.mock.MockCrawlerServer;
 import edu.iit.swyne.crawler.server.CrawlerServer;
 import edu.iit.swyne.crawler.server.SwyneCrawlerServerProtocol;
+import edu.iit.swyne.crawler.server.SwyneCrawlerServerProtocol.ClientExitException;
 
 public class TestSwyneCrawlerServerProtocol extends TestCase {
 	private static final String COLLECTION = "LATimes";
@@ -104,7 +105,12 @@ public class TestSwyneCrawlerServerProtocol extends TestCase {
 	public void testExit() throws Exception {
 		String command = "exit\n" + addDirective;
 		
-		SwyneCrawlerServerProtocol.run(command, server);
-		assertFalse(server.getCrawler().isTrackingFeed(feedURL));
+		try {
+			SwyneCrawlerServerProtocol.run(command, server);
+		}
+		catch(ClientExitException e) {
+			return;
+		}
+		fail();
 	}
 }
