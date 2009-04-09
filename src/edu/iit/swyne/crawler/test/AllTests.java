@@ -15,6 +15,7 @@ public class AllTests {
 		suite.addTestSuite(TestSwyneCrawler.class);
 		suite.addTestSuite(TestSwyneCrawlerServerProtocol.class);
 		suite.addTestSuite(TestSwyneCrawlerServerSocketInterface.class);
+		suite.addTestSuite(TestMetric.class);
 		
 		return suite;
 	}
