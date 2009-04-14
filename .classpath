@@ -15,5 +15,6 @@
 			<attribute name="javadoc_location" value="jar:platform:/resource/crawler/lib/rome-fetcher-1.0RC2-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="lib/core.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
