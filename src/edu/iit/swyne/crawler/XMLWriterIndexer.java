@@ -1,8 +1,9 @@
 package edu.iit.swyne.crawler;
 
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.Properties;
 
 import org.jdom.Document;
@@ -43,7 +44,7 @@ public class XMLWriterIndexer extends Indexer {
 		try {
 			outputFile.getParentFile().mkdirs();
 			outputFile.createNewFile();
-			out.output(xmlDoc, new FileWriter(outputFile));
+			out.output(xmlDoc, new OutputStreamWriter(new FileOutputStream(outputFile), "UTF-8"));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
