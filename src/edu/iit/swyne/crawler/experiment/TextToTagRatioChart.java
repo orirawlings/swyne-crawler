@@ -7,7 +7,9 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import edu.iit.swyne.crawler.extractor.Clusterer;
 import edu.iit.swyne.crawler.extractor.TextToTagExtractor;
+import edu.iit.swyne.crawler.extractor.Clusterer.ClusterAlgorithm;
 
 import processing.core.PApplet;
 
@@ -16,6 +18,9 @@ public class TextToTagRatioChart extends PApplet {
 	private static final long serialVersionUID = -6028427891320535337L;
 	private static URL u;
 	private static double max, textToTagRatios[];
+	private Clusterer clusterer;
+	private int xOffset, yOffset,chartWidth, chartHeight;
+	private float timer;
 	
 	public static void main(String[] args) {
 		try {
@@ -31,9 +36,8 @@ public class TextToTagRatioChart extends PApplet {
 	public void setup() {
 		size(800, 450);
 		background(150);
-//		noStroke();
-		stroke(0);
-		fill(0);
+		
+		clusterer = new Clusterer(ClusterAlgorithm.THRESHOLD);
 		
 		String htmlText;
 		try {
@@ -47,20 +51,12 @@ public class TextToTagRatioChart extends PApplet {
 			for (int i = 0; i < textToTagRatios.length; i++)
 				if (textToTagRatios[i] > max) max = textToTagRatios[i];
 			
-			int bars = textToTagRatios.length;
-			for (int i = 0; i < textToTagRatios.length; i++) {
-				rect(i*((float) (width-20))/bars+10, (float) ((height-20) - ((float) (height-20)*textToTagRatios[i]/max)), ((float) (width-20))/bars, (float) ((float) (height-20)*textToTagRatios[i]/max));
-			}
-			saveFrame("text2tag.tiff");
-			
-			background(150);
-			double[] smoothed = TextToTagExtractor.smooth(textToTagRatios, 3);
-			bars = smoothed.length;
-			for (int i = 0; i < smoothed.length; i++) {
-				rect(i*((float) (width-20))/bars+10, (float) ((height-20) - ((float) (height-20)*smoothed[i]/max)), ((float) (width-20))/bars, (float) ((float) (height-20)*smoothed[i]/max));
-			}
-			saveFrame("text2tag_smoothed.tiff");
-		} catch (IOException e) {
+			xOffset = 10;
+			yOffset = 10;
+			chartWidth = width - 2 * xOffset;
+			chartHeight = height - 2 * yOffset;
+		}
+		catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
@@ -68,12 +64,35 @@ public class TextToTagRatioChart extends PApplet {
 	@Override
 	public void draw() {
 		background(100);
+		rectMode(CORNER);
 		
-		double[] smoothed = TextToTagExtractor.smooth(textToTagRatios, 50*mouseX/width);
+		boolean[] colored = clusterer.cluster(textToTagRatios);
+		double[] smoothed = TextToTagExtractor.smooth(textToTagRatios, TextToTagExtractor.DEFAULT_SMOOTHING_RADIUS);
+		
+//		float angle = PI*timer/180;
+		float angle = (PI*mouseX)/(180*width);
+		float originalAlpha = 255*(sq(sin(angle/2)));
+		float smoothedAlpha = 255*(sq(cos(angle/2)));
+		
+		
 		
 		int bars = smoothed.length;
+		noStroke();
 		for (int i = 0; i < smoothed.length; i++) {
-			rect(i*((float) (width-20))/bars+10, (float) ((height-20) - ((float) (height-20)*smoothed[i]/max)), ((float) (width-20))/bars, (float) ((float) (height-20)*smoothed[i]/max));
+			fill(colored[i] ? color(0, 255, 0, originalAlpha) : color(255, 255, 255, originalAlpha));
+			rect(xOffset + ((float) i*chartWidth)/bars, height-yOffset - (float) (chartHeight*textToTagRatios[i]/max), ((float) chartWidth)/bars, (float) (chartHeight*textToTagRatios[i]/max));
+			
+			fill(colored[i] ? color(0, 255, 0, smoothedAlpha) : color(255, 255, 255, smoothedAlpha));
+			rect(xOffset + ((float) i*chartWidth)/bars, height-yOffset - (float) (chartHeight*smoothed[i]/max), ((float) chartWidth)/bars, (float) (chartHeight*smoothed[i]/max));
 		}
+		stroke(255);
+		double stdDev = TextToTagExtractor.standardDeviation(smoothed);
+		line(xOffset, height-yOffset - (float) (chartHeight*stdDev/max), width - xOffset, height-yOffset - (float) (chartHeight*stdDev/max));
+		
+		rectMode(CENTER);
+		noFill();
+		ellipse(xOffset*2, yOffset*2, xOffset*2, yOffset*2);
+		ellipse(xOffset*2 + xOffset*cos(angle), yOffset*2 + yOffset*sin(angle), ((float) xOffset)/2, ((float) yOffset)/2);
+		timer++;
 	}
 }

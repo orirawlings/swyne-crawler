@@ -32,6 +32,9 @@ public class CorpusBuilder extends XMLWriterIndexer {
 	
 	@Override
 	public void sendDocument(NewsDocument doc) {
+		if (doc.getArticle() == null || doc.getArticle().equals(""))
+			return;
+		
 		Integer collectionCount = docCounts.get(doc.getCollection());
 		if (collectionCount != null && collectionCount.compareTo(maxDocsPerCollection) >= 0)
 			return;

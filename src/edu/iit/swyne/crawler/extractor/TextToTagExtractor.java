@@ -12,10 +12,9 @@ import edu.iit.swyne.crawler.extractor.Clusterer.ClusterAlgorithm;
 
 public class TextToTagExtractor extends ArticleExtractor {
 
-	private static final int DEFAULT_SMOOTHING_RADIUS = 2;
-	private static final Clusterer DEFAULT_CLUSTERER = new Clusterer(ClusterAlgorithm.THRESHOLD);
+	public static final int DEFAULT_SMOOTHING_RADIUS = 2;
+	public static final Clusterer DEFAULT_CLUSTERER = new Clusterer(ClusterAlgorithm.THRESHOLD);
 	
-	private int smoothingRadius = DEFAULT_SMOOTHING_RADIUS;
 	private Clusterer clusterer = DEFAULT_CLUSTERER;
 	
 	protected String html;
@@ -48,9 +47,6 @@ if(html.equals("")) System.err.println(articleURL);
 		// Generate Text-To-Tag Ratio Array
 		htmlLines = html.split("\\n|\\n\r\\r\n|\\r|\\u0085|\\u2028|\\u2029");
 		textToTagRatios = generateTextToTag(htmlLines);
-		
-		// Perform a smoothing pass on the Ratio Array
-		textToTagRatios = smooth(textToTagRatios, smoothingRadius);
 		
 		// Cluster the lines of HTML
 		boolean[] classifications = clusterer.cluster(textToTagRatios);
@@ -137,5 +133,26 @@ if(html.equals("")) System.err.println(articleURL);
 	
 	public static void main(String[] args) throws IOException {
 		TextToTagRatioChart.main(args);
+	}
+
+	public static double standardDeviation(double[] data) {
+		double avg = mean(data);
+		double[] squares = new double[data.length];
+		for (int i = 0; i < data.length; i++) {
+			squares[i] = Math.pow(data[i] - avg, 2);
+		}
+		return Math.sqrt(mean(squares));
+	}
+	
+	public static double mean(double[] data) {
+		return mean(data, 0, data.length);
+	}
+
+	public static double mean(double[] data, int firstIndex, int secondIndex) {
+		double sum = 0;
+		secondIndex = secondIndex < data.length ? secondIndex : data.length-1;
+		for (int i = firstIndex; i <= secondIndex; i++)
+			sum += data[i];
+		return sum / data.length;
 	}
 }
