@@ -21,6 +21,10 @@ public class TextToTagRatioChart extends PApplet {
 	private Clusterer clusterer;
 	private int xOffset, yOffset,chartWidth, chartHeight;
 	private float timer;
+	private boolean[] colored;
+	private double[] smoothed;
+	
+	boolean captured = false;
 	
 	public static void main(String[] args) {
 		try {
@@ -37,6 +41,8 @@ public class TextToTagRatioChart extends PApplet {
 		size(800, 450);
 		background(150);
 		
+//		clusterer = new Clusterer(ClusterAlgorithm.K_MEANS);
+//		clusterer = new Clusterer(ClusterAlgorithm.PREDICTION);
 		clusterer = new Clusterer(ClusterAlgorithm.THRESHOLD);
 		
 		String htmlText;
@@ -55,6 +61,9 @@ public class TextToTagRatioChart extends PApplet {
 			yOffset = 10;
 			chartWidth = width - 2 * xOffset;
 			chartHeight = height - 2 * yOffset;
+
+			colored = clusterer.cluster(textToTagRatios);
+			smoothed = TextToTagExtractor.smooth(textToTagRatios, TextToTagExtractor.DEFAULT_SMOOTHING_RADIUS);
 		}
 		catch (IOException e) {
 			e.printStackTrace();
@@ -65,16 +74,10 @@ public class TextToTagRatioChart extends PApplet {
 	public void draw() {
 		background(100);
 		rectMode(CORNER);
-		
-		boolean[] colored = clusterer.cluster(textToTagRatios);
-		double[] smoothed = TextToTagExtractor.smooth(textToTagRatios, TextToTagExtractor.DEFAULT_SMOOTHING_RADIUS);
-		
-//		float angle = PI*timer/180;
-		float angle = (PI*mouseX)/(180*width);
-		float originalAlpha = 255*(sq(sin(angle/2)));
-		float smoothedAlpha = 255*(sq(cos(angle/2)));
-		
-		
+				
+		float angle = PI*timer/180;
+		float originalAlpha = 255*(sq(cos(angle/2)));
+		float smoothedAlpha = 255*(sq(sin(angle/2)));
 		
 		int bars = smoothed.length;
 		noStroke();
@@ -94,5 +97,10 @@ public class TextToTagRatioChart extends PApplet {
 		ellipse(xOffset*2, yOffset*2, xOffset*2, yOffset*2);
 		ellipse(xOffset*2 + xOffset*cos(angle), yOffset*2 + yOffset*sin(angle), ((float) xOffset)/2, ((float) yOffset)/2);
 		timer++;
+		
+		if (!captured) {
+			saveFrame("chart");
+			captured = true;
+		}
 	}
 }

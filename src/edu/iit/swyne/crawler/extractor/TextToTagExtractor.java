@@ -150,9 +150,11 @@ if(html.equals("")) System.err.println(articleURL);
 
 	public static double mean(double[] data, int firstIndex, int secondIndex) {
 		double sum = 0;
+		
+		firstIndex = firstIndex >= 0 ? firstIndex : 0;
 		secondIndex = secondIndex < data.length ? secondIndex : data.length-1;
 		for (int i = firstIndex; i <= secondIndex; i++)
 			sum += data[i];
-		return sum / data.length;
+		return sum / (1 + secondIndex - firstIndex);
 	}
 }
