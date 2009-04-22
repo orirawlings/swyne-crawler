@@ -24,7 +24,7 @@ public class SwyneIndexer extends Indexer {
 		String message = "SUBMIT\n";
 		
 		message += "title: "+doc.getTitle()+"\n";
-		message += "published: "+doc.getPublishedDate().toString()+"\n";
+		message += "published: "+doc.getPublishedDate().getTime()+"\n";
 		message += "source: "+doc.getSource()+"\n";
 		message += "collection: "+doc.getCollection()+"\n";
 		message += "article: \n"+doc.getArticle()+"\n";
