@@ -4,6 +4,7 @@
 	<entry key="crawler.indexer.class">edu.iit.swyne.crawler.SwyneIndexer</entry>
 	<entry key="crawler.indexer.host">localhost</entry>
 	<entry key="crawler.indexer.port">6969</entry>
+	<entry key="crawler.maxThreads">1</entry>
 	<entry key="output.err.file">tmp/errLog.txt</entry>
 	<entry key="output.out.file">tmp/log.txt</entry>
 </properties>
