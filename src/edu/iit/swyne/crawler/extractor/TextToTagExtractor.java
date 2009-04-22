@@ -65,6 +65,10 @@ if(html.equals("")) System.err.println(articleURL);
 		
 		return doc;
 	}
+	
+	public void setClusteringAlgorithm(ClusterAlgorithm algo) {
+		this.clusterer = new Clusterer(algo);
+	}
 
 	private static String plainText(String html) {
 		return html.replaceAll("<.*?(\\n.*?)*?>", "");
