@@ -1,0 +1,9 @@
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	<comment>Index to Swyne</comment>
+	<entry key="crawler.indexer.class">edu.iit.swyne.crawler.SwyneIndexer</entry>
+	<entry key="crawler.indexer.host">localhost</entry>
+	<entry key="crawler.indexer.port">6969</entry>
+	<entry key="output.err.file">tmp/errLog.txt</entry>
+	<entry key="output.out.file">tmp/log.txt</entry>
+</properties>
