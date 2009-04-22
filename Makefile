@@ -14,4 +14,4 @@ build_corpus:
 	java -cp bin:lib/htmlparser.jar:lib/rome-1.0RC2.jar:lib/rome-fetcher-1.0RC2.jar:lib/jdom.jar:lib/junit-4.5.jar:$(CLASSPATH) edu.iit.swyne.crawler.server.SwyneCrawlerServer config/corpus_build.xml &
 
 experiment:
-	java -d64 -Xms128m -Xmx512m -cp bin:lib/htmlparser.jar:lib/rome-1.0RC2.jar:lib/rome-fetcher-1.0RC2.jar:lib/jdom.jar:lib/junit-4.5.jar:$(CLASSPATH) edu.iit.swyne.crawler.experiment.Experiment data/corpus/corpusNews.xml data/corpus
+	java -d64 -Xms128m -Xmx512m -cp bin:lib/htmlparser.jar:lib/rome-1.0RC2.jar:lib/rome-fetcher-1.0RC2.jar:lib/jdom.jar:lib/junit-4.5.jar:lib/core.jar:$(CLASSPATH) edu.iit.swyne.crawler.experiment.Experiment data/corpus/corpusNews.xml data/corpus
